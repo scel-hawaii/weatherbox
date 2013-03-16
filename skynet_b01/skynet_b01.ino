@@ -1,12 +1,14 @@
-#define NODE_ADDRESS 106
-
+#define NODE_ADDRESS 103
+// change me!!!11!1
 #include <Wire.h>
 #include <Adafruit_BMP085.h>
 
 #include <SoftwareSerial.h>
 #include <XBee.h>
+#include <Adafruit_INA219.h>
 
 Adafruit_BMP085 bmp085;
+Adafruit_INA219 ina219_Solar;
 
 SoftwareSerial softserial(2, 3);
 
@@ -16,7 +18,7 @@ XBeeAddress64 addr64 = XBeeAddress64(0, 0);
 uint8_t payload[243];
 
 long address = NODE_ADDRESS;
-long batt_mv, panel_mv;
+long batt_mv, panel_mv, panel_ma;
 long bmp085_temp_decic;
 long bmp085_press_pa;
 long apogee_mv, apogee_w_m2;
@@ -27,6 +29,7 @@ void setup()
     softserial.begin(9600);
     xbee.begin(softserial);
     bmp085.begin();
+    ina219_Solar.begin();
 
     time = millis();
 }
@@ -56,6 +59,10 @@ void loop()
     s += ", \"apogee_w_m2\": ";
     apogee_w_m2 = apogee_mv*5.0;
     s += String(apogee_w_m2);
+    
+    s += ", \"panel_ma\": ";
+    panel_ma = ina219_Solar.getCurrent_mA()*100;
+    s += String(panel_ma);
     s += "}";
 
     s += "       ";		// it explodes without something here... omg wtf
