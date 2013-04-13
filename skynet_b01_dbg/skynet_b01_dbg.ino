@@ -1,4 +1,4 @@
-#define NODE_ADDRESS 103
+#define NODE_ADDRESS 101
 // change me!!!11!1
 #include <Wire.h>
 #include <Adafruit_BMP085.h>
