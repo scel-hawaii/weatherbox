@@ -81,8 +81,8 @@ void loop()
 	payload[i] = s[i];
 
     analogWrite(13, 255);
-    // ZBTxRequest zbTx = ZBTxRequest(addr64, payload, len);
-    // xbee.send(zbTx);
+    ZBTxRequest zbTx = ZBTxRequest(addr64, payload, len);
+    xbee.send(zbTx);
     Serial.println(s);
     analogWrite(13, 0);
    // delay(14800);
