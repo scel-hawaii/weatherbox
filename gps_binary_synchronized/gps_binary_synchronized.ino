@@ -10,6 +10,8 @@
 
 #include <string.h>		// memcpy
 
+#include <EEPROM.h>
+
 Adafruit_BMP085 bmp085;
 
 SoftwareSerial xbee_softserial(2, 3);
@@ -21,7 +23,8 @@ Adafruit_GPS gps(&mySerial);
 
 uint8_t rf_payload[243];
 
-long address = 0;
+// Read the address from the EEProm
+long address = EEPROM.read(2) | (EEPROM.read(3)<<8);        
 
 typedef struct
 {
@@ -133,7 +136,7 @@ void loop()
 	{
 	    sample_ms = timer_ms;
 	    sample();
-	    // transmit();
+	    //transmit();
 	}
 
 	if (now() % 60 == 0 && 
