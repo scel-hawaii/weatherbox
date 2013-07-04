@@ -7,6 +7,8 @@
 #include <XBee.h>
 #include <Adafruit_INA219.h>
 
+#include <EEPROM.h>
+
 Adafruit_BMP085 bmp085;
 Adafruit_INA219 ina219_Solar;
 
