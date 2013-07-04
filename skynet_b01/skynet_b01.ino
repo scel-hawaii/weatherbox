@@ -17,7 +17,8 @@ XBeeAddress64 addr64 = XBeeAddress64(0, 0);
 
 uint8_t payload[243];
 
-long address = NODE_ADDRESS;
+// Grab the address from the Arduino EEPROM 
+long address = EEPROM.read(2) | (EEPROM.read(3)<<8);
 long batt_mv, panel_mv, panel_ma;
 long bmp085_temp_decic;
 long bmp085_press_pa;
