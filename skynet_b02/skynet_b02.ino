@@ -74,40 +74,6 @@ void configureWDT(void);
 void enterSleep(void);
 void configurePins(void);
 
-void configurePins(){
-    #ifdef ANEMOMETER
-    pinMode(_PIN_ANEMOMETER0, INPUT);
-    pinMode(_PIN_ANEMOMETER1, OUTPUT);
-    pinMode(_PIN_ANEMOMETER2, OUTPUT);
-    pinMode(_PIN_ANEMOMETER3, OUTPUT);
-    #endif
-
-    #ifndef ANEMOMETER
-    pinMode(_PIN_ANEMOMETER0, OUTPUT);
-    pinMode(_PIN_ANEMOMETER1, OUTPUT);
-    pinMode(_PIN_ANEMOMETER2, OUTPUT);
-    pinMode(_PIN_ANEMOMETER3, OUTPUT);
-    pinMode(9, OUTPUT);
-    digitalWrite(9, LOW); 
-    digitalWrite(_PIN_ANEMOMETER0, LOW); 
-    digitalWrite(_PIN_ANEMOMETER1, LOW); 
-    digitalWrite(_PIN_ANEMOMETER2, LOW); 
-    digitalWrite(_PIN_ANEMOMETER3, LOW); 
-    #endif
-
-    
-    pinMode(_PIN_XBEE_SLEEP, OUTPUT);
-    digitalWrite(_PIN_XBEE_SLEEP, LOW);
-
-    pinMode(_PIN_PSWITCH, OUTPUT);
-    digitalWrite(_PIN_PSWITCH, HIGH);
-    
-    pinMode(_PIN_SOLAR_V, INPUT);
-    pinMode(_PIN_APOGEE_V, INPUT);
-    pinMode(_PIN_BATT_V, INPUT);
-}
-
-
 void setup() {
     Serial.begin(9600);
     xbee.begin(Serial);
@@ -141,7 +107,6 @@ void setup() {
 
     time = millis();
 }
-
 
 void loop() {
     if(f_wdt == 1)
@@ -254,20 +219,66 @@ void loop() {
     
 }
 
-// Samples the battery voltage 100 times and takes an average
-// Returns the average of 100 samples
+void configurePins(){
+    #ifdef ANEMOMETER
+    pinMode(_PIN_ANEMOMETER0, INPUT);
+    pinMode(_PIN_ANEMOMETER1, OUTPUT);
+    pinMode(_PIN_ANEMOMETER2, OUTPUT);
+    pinMode(_PIN_ANEMOMETER3, OUTPUT);
+    #endif
+
+    #ifndef ANEMOMETER
+    pinMode(_PIN_ANEMOMETER0, OUTPUT);
+    pinMode(_PIN_ANEMOMETER1, OUTPUT);
+    pinMode(_PIN_ANEMOMETER2, OUTPUT);
+    pinMode(_PIN_ANEMOMETER3, OUTPUT);
+    pinMode(9, OUTPUT);
+    digitalWrite(9, LOW); 
+    digitalWrite(_PIN_ANEMOMETER0, LOW); 
+    digitalWrite(_PIN_ANEMOMETER1, LOW); 
+    digitalWrite(_PIN_ANEMOMETER2, LOW); 
+    digitalWrite(_PIN_ANEMOMETER3, LOW); 
+    #endif
+
+    
+    pinMode(_PIN_XBEE_SLEEP, OUTPUT);
+    digitalWrite(_PIN_XBEE_SLEEP, LOW);
+
+    pinMode(_PIN_PSWITCH, OUTPUT);
+    digitalWrite(_PIN_PSWITCH, HIGH);
+    
+    pinMode(_PIN_SOLAR_V, INPUT);
+    pinMode(_PIN_APOGEE_V, INPUT);
+    pinMode(_PIN_BATT_V, INPUT);
+}
+
+
+/***************************************************
+ *  Name:        sampleBatteryVoltage
+ *  Returns:     an averaged battery voltage.
+ *  Parameters:  None.
+ *  Description: Samples the battery ADC voltage multiple times
+                    and averages it 
+ ***************************************************/
 long sampleBatteryVoltage(void){
     double temp;
-    // sample 100 times and average it
-    for(i = 0; i < 200 ; i++) {
+    for(i = 0; i < ADC_SAMPLE_NUM ; i++) {
         temp += analogRead(_PIN_BATT_V); 
     }
-    temp = temp/200;
+    temp = temp/ADC_SAMPLE_NUM;
     return ((temp*5000.0/1024));
 }
 
-// puts the a battery sample into a moving average
-// and spits out a "smooth" battery voltage value
+/***************************************************
+ *  Name:        sampleSmoothBatteryV
+ *  Returns:     smooth battery voltage.
+ *  Parameters:  raw unsmooth sample.
+ *  Description: Takes the current sample, puts it into
+                    a running average, and spits back out a 
+                    smooth sample. This is primarily used 
+                    for voltage detection during the 
+                    power cutoff point.
+ ***************************************************/
 long sampleSmoothBatteryV(int sample){
     double temp;
     /*
@@ -286,6 +297,13 @@ long sampleSmoothBatteryV(int sample){
 }
 
 
+/***************************************************
+ *  Name:        configureWDT
+ *  Returns:     Nothing.
+ *  Parameters:  None.
+ *  Description: configured the Watch Dog timer for the
+                    appropriate settings
+ ***************************************************/
 void configureWDT(void){
     /* Clear the reset flag. */
     MCUSR &= ~(1<<WDRF);
@@ -307,14 +325,10 @@ void configureWDT(void){
 
 /***************************************************
  *  Name:        ISR(WDT_vect)
- *
  *  Returns:     Nothing.
- *
  *  Parameters:  None.
- *
  *  Description: Watchdog Interrupt Service. This
  *               is executed when watchdog timed out.
- *
  ***************************************************/
 ISR(WDT_vect)
 {
@@ -330,13 +344,9 @@ ISR(WDT_vect)
 
 /***************************************************
  *  Name:        enterSleep
- *
  *  Returns:     Nothing.
- *
  *  Parameters:  None.
- *
  *  Description: Enters the arduino into sleep mode.
- *
  ***************************************************/
 void enterSleep(void)
 {
