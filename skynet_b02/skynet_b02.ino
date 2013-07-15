@@ -151,7 +151,7 @@ void loop() {
             s += String(apogee_w_m2);
 
             s += ", \"panel_ua\": ";
-            panel_ma = ina219_Solar.getCurrent_mA()*1000;
+            panel_ua = ina219_Solar.getCurrent_mA()*1000;
             s += String(panel_ua);
 
             s += ", \"dallas_roof_c\": ";
