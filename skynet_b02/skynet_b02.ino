@@ -26,7 +26,6 @@
 #define FALSE 0
 #define TRUE 1
 
-
 #define pMode_NORMAL 0
 #define pMode_POWERSAVE 1
 #define POWERSAVE
@@ -38,12 +37,6 @@ OneWire oneWire2(_PIN_ROOF_TEMP);
 DallasTemperature dallas_roof_sen(&oneWire2);
 
 SHT1x sht1x(_PIN_HUMID_DATA, _PIN_HUMID_CLK);
-
-// Define various ADC prescaler
-const unsigned char PS_16 = (1 << ADPS2);
-const unsigned char PS_32 = (1 << ADPS2) | (1 << ADPS0);
-const unsigned char PS_64 = (1 << ADPS2) | (1 << ADPS1);
-const unsigned char PS_128 = (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0);
 
 Adafruit_BMP085 bmp085;
 Adafruit_INA219 ina219_Solar;
@@ -201,12 +194,10 @@ void loop() {
             dallas_rooftemp_c = dallas_roof_sen.getTempCByIndex(0);
             s += String(dallas_rooftemp_c);
 
-            /*
             s += ", \"dallas_amb_c\": ";
             dallas_amb_sen.requestTemperatures();
             dallas_ambtemp_c = dallas_amb_sen.getTempCByIndex(0);
             s += String(dallas_ambtemp_c);
-            */
             s += "}";
             s += "       ";		// it explodes without something here... omg wtf
 
