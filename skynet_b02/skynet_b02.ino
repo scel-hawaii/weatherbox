@@ -144,7 +144,7 @@ void loop() {
             panel_mv = 2*analogRead(1)*5000.0/1024;
             s += String(panel_mv);
             s += ", \"apogee_mv\": ";
-            apogee_mv = (1/15.24)*analogRead(2)*5000.0/1024;
+            apogee_mv = analogRead(2)*5000.0/1024;
             s += String(apogee_mv);
             s += ", \"apogee_w_m2\": ";
             apogee_w_m2 = apogee_mv*5.0;
@@ -315,8 +315,8 @@ void configureWDT(void){
 
     /* set new watchdog timeout prescaler value */
     //WDTCSR = 1<<WDP2 | 1<<WDP1; /* 1.0 seconds */
-    WDTCSR = 1<<WDP3; /* 4.0 seconds */
-    //WDTCSR = 1<<WDP3 | 1<<WDP0; /* 8.0 seconds */
+    //WDTCSR = 1<<WDP3; /* 4.0 seconds */
+    WDTCSR = 1<<WDP3 | 1<<WDP0; /* 8.0 seconds */
 
     /* Enable the WD interrupt (note no reset). */
     WDTCSR |= _BV(WDIE);
