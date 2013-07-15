@@ -55,7 +55,7 @@ unsigned int smooth_sample_index = 0;
 
 // Grab the address from the Arduino EEPROM 
 long address = EEPROM.read(2) | (EEPROM.read(3)<<8);
-long batt_mv, panel_mv, panel_ma;
+long batt_mv, panel_mv, panel_ua;
 long bmp085_temp_decic;
 long bmp085_press_pa;
 long apogee_mv, apogee_w_m2;
@@ -185,9 +185,9 @@ void loop() {
             apogee_w_m2 = apogee_mv*5.0;
             s += String(apogee_w_m2);
 
-            s += ", \"panel_ma\": ";
-            panel_ma = ina219_Solar.getCurrent_mA()*100;
-            s += String(panel_ma);
+            s += ", \"panel_ua\": ";
+            panel_ma = ina219_Solar.getCurrent_mA()*1000;
+            s += String(panel_ua);
 
             s += ", \"dallas_roof_c\": ";
             dallas_roof_sen.requestTemperatures();
