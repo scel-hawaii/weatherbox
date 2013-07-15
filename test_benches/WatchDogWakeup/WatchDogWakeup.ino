@@ -10,6 +10,7 @@
 #define LED_PIN (13)
 
 volatile int f_wdt=1;
+long time = 0;
 
 
 
@@ -101,6 +102,7 @@ void setup()
   
   Serial.println("Initialisation complete.");
   delay(100); //Allow for serial print to complete.
+  time = millis();
 }
 
 
@@ -121,6 +123,8 @@ void loop()
   {
     /* Toggle the LED */
     digitalWrite(LED_PIN, !digitalRead(LED_PIN));
+    Serial.println(millis());
+    delay(10);
     
     /* Don't forget to clear the flag. */
     f_wdt = 0;
