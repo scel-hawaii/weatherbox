@@ -20,11 +20,15 @@
 #include <avr/power.h>
 #include <avr/wdt.h>
 
+#define XBEE_TRANSMIT_CODE
+
 Adafruit_BMP085 bmp085;
 
-SoftwareSerial xbee_softserial(2, 3);
+#ifdef XBEE_TRANSMIT_CODE
+// SoftwareSerial xbee_softserial(2, 3);
 XBee xbee = XBee();
 XBeeAddress64 addr64 = XBeeAddress64(0, 0);
+#endif
 
 SoftwareSerial mySerial(5, 4);	// rx, tx
 Adafruit_GPS gps(&mySerial);
@@ -51,12 +55,14 @@ long sampleSmoothBatteryV(int sample);
 void configureWDT(void);
 void enterSleep(void);
 void configurePins(void);
-
 void setup() {
-    xbee_softserial.begin(9600);
-    xbee.begin(xbee_softserial);
     Serial.begin(9600);
+    #ifdef XBEE_TRANSMIT_CODE
+    xbee.begin(Serial);
+    #else
+    #endif
 
+    // GPS! 
     gps.begin(9600);
     gps.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCGGA);
     gps.sendCommand(PMTK_SET_NMEA_UPDATE_1HZ);
@@ -72,12 +78,9 @@ void setup() {
 
     // Configure the WDT for sleep
     configureWDT();
+    configurePins();
 }
 
-// replaces Adafruit_GPS "useInterrupt" shenanigans
-SIGNAL(TIMER0_COMPA_vect) {
-    char c = gps.read();
-}
 
 void loop()
 {
@@ -115,7 +118,11 @@ void loop()
             }
         }
 
+        sample();
+        transmit();
+        clear_packet();
         
+        delay(250);
         /* Adam's old transmit/sample code
         // Cheesy timer wrap-around handling
         if (timer_ms > millis())
@@ -149,7 +156,6 @@ void loop()
         }
         */
 
-        Serial.println("Test");
         delay(100);
         f_wdt = 0;
         enterSleep();
@@ -182,10 +188,12 @@ void sample()
 
 void transmit()
 {
+    #ifdef XBEE_TRANSMIT_CODE
     memset(rf_payload, '\0', sizeof(rf_payload));
     memcpy(rf_payload, &packet, sizeof(packet));
     ZBTxRequest zbTx = ZBTxRequest(addr64, rf_payload, sizeof(packet));
     xbee.send(zbTx);
+    #endif
 }
 
 void clear_packet()
@@ -241,6 +249,11 @@ void configurePins(){
     pinMode(_PIN_BATT_V, INPUT);
 }
 
+
+// replaces Adafruit_GPS "useInterrupt" shenanigans
+SIGNAL(TIMER0_COMPA_vect) {
+    char c = gps.read();
+}
 
 /***************************************************
  *  Name:        configureWDT
