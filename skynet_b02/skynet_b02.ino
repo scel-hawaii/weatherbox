@@ -141,10 +141,10 @@ void loop() {
             s += String(smooth_batt_mv);
 
             s += ", \"panel_mv\": ";
-            panel_mv = 2*analogRead(1)*5000.0/1024;
+            panel_mv = 2*analogRead(1)*5000.0/1023;
             s += String(panel_mv);
             s += ", \"apogee_mv\": ";
-            apogee_mv = analogRead(2)*5000.0/1024;
+            apogee_mv = analogRead(2)*5000.0/1023;
             s += String(apogee_mv);
             s += ", \"apogee_w_m2\": ";
             apogee_w_m2 = apogee_mv*5.0;
@@ -266,7 +266,7 @@ long sampleBatteryVoltage(void){
         temp += analogRead(_PIN_BATT_V); 
     }
     temp = temp/ADC_SAMPLE_NUM;
-    return ((temp*5000.0/1024));
+    return ((temp*5000.0/1023));
 }
 
 /***************************************************
