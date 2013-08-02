@@ -156,12 +156,12 @@ void loop() {
 
             s += ", \"dallas_roof_c\": ";
             dallas_roof_sen.requestTemperatures();
-            dallas_rooftemp_c = dallas_roof_sen.getTempCByIndex(0);
+            dallas_rooftemp_c = dallas_roof_sen.getTempCByIndex(0)*100;
             s += String(dallas_rooftemp_c);
 
             s += ", \"dallas_amb_c\": ";
             dallas_amb_sen.requestTemperatures();
-            dallas_ambtemp_c = dallas_amb_sen.getTempCByIndex(0);
+            dallas_ambtemp_c = dallas_amb_sen.getTempCByIndex(0)*100;
             s += String(dallas_ambtemp_c);
             s += "}";
             s += "       ";		// it explodes without something here... omg wtf
