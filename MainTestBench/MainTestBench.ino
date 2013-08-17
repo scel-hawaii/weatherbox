@@ -83,7 +83,7 @@ schema_1 packet;
 
 #define PACKET_UART 0
 #define PACKET_BIN 1
-const int _CONFIG_PacketFormat = PACKET_UART; 
+const int _CONFIG_PacketFormat = PACKET_BIN; 
 
 void setup() {
     Serial.begin(9600);
@@ -99,8 +99,27 @@ void setup() {
     ADCSRA |= PS_64;    // set our own prescaler to 64 
 
     time = millis();
+    clear_packet();
 }
 
+void clear_packet()
+{
+    packet.schema = 1;
+    packet.address = address;
+    packet.uptime_ms = 0;
+    packet.gps_valid_sats = 0;
+    packet.n = 0;
+    packet.bmp085_press_pa = 0;
+    packet.bmp085_temp_decic = 0;
+    packet.humidity_centi_pct = 0;
+    int i;
+    for (i = 0; i < 60; i += 1)
+    {
+	packet.batt_mv[i/4] = 0;
+	packet.panel_mv[i/4] = 0;
+	packet.apogee_w_m2[i] = 0;
+    }
+}
 void loop() {
     // Turn on all the sensors and Xbee
     digitalWrite(_PIN_XBEE_SLEEP, LOW);
@@ -114,6 +133,7 @@ void loop() {
     else if(_CONFIG_PacketFormat == PACKET_BIN) {
         samplePacketBinary();
         transmitPacketBinary(); 
+        clear_packet();
     }
     else {
         // Do nothing 
