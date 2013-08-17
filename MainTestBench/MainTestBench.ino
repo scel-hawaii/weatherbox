@@ -107,17 +107,9 @@ void setup() {
 }
 
 void loop() {
+            // Turn on all the sensors and Xbee
             digitalWrite(_PIN_XBEE_SLEEP, LOW);
             digitalWrite(_PIN_PSWITCH, HIGH);
-
-            softserial.print("Enough voltage: ");
-            softserial.println(smooth_batt_mv);
-
-            smooth_batt_mv = sampleSmoothBatteryV(sampleBatteryVoltage());
-            if(smooth_batt_mv < 3700) 
-                isEnoughVoltage = FALSE;
-            else 
-                isEnoughVoltage = TRUE;
 
             String s = "{";
             s += "\"address\": ";
