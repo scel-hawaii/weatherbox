@@ -1,3 +1,17 @@
+/****************************************************
+ *
+ *          skynet_b03.ino
+ *          REIS Weatherbox Firmware b03
+ *          
+ *          The main driver file for the REIS weatherbox. 
+ *          -------------------------------------
+ *          Major Design Changelog (See readme for more):
+ *          - Double features: binary packet AND UART packet
+ *          - For future "on the fly", live config changes
+ *          - Better program flow for live  system config changes
+ *          - Confirmed xbee needs to be in router
+ *
+ ****************************************************/
 #include "skynet_b03.h"
 
 #include <Wire.h>
