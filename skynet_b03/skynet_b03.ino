@@ -20,16 +20,8 @@
 
 #include "schema.h"
 
-#define dataPin 8
-#define clockPin 7
-#define ONE_WIRE_BUS 2
-
 #define FALSE 0
 #define TRUE 1
-
-#define pMode_NORMAL 0
-#define pMode_POWERSAVE 1
-#define POWERSAVE
 
 OneWire oneWire1(_PIN_AMB_TEMP);
 DallasTemperature dallas_amb_sen(&oneWire1);
@@ -81,10 +73,6 @@ int len;
 uint8_t rf_payload[243];
 schema_1 packet;
 
-#define PACKET_UART 0
-#define PACKET_BIN 1
-const int _CONFIG_PacketFormat = PACKET_BIN; 
-const int _CONFIG_TransmitPeriod = 60;
 long sample_counter = 0; 
 
 void setup() {
