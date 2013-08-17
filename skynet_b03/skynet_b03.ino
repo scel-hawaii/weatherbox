@@ -15,6 +15,8 @@
 #include <avr/power.h>
 #include <avr/wdt.h>
 
+#include "sleep.h"
+
 #include <SHT1x.h>
 #include <OneWire.h>
 #include <DallasTemperature.h>
@@ -40,23 +42,17 @@ SoftwareSerial softserial(9, 10);
 XBee xbee = XBee();
 XBeeAddress64 addr64 = XBeeAddress64(0, 0);
 
-unsigned int isEnoughVoltage = TRUE;
-
 uint8_t payload[243];
-unsigned int smooth_sample_index = 0;
 
 // Grab the address from the Arduino EEPROM 
 long address = EEPROM.read(2) | (EEPROM.read(3)<<8);
+
 long batt_mv, panel_mv, panel_ua;
 long bmp085_temp_decic;
 long bmp085_press_pa;
 long apogee_mv, apogee_w_m2;
 long dallas_rooftemp_c, dallas_ambtemp_c;
 
-long time = 0;
-volatile int f_wdt = 1;
-
-unsigned int battery;
 unsigned int i;
 unsigned int pMode;
 
@@ -71,22 +67,19 @@ long sample_counter = 0;
 
 void setup() {
     Serial.begin(9600);
+
     xbee.begin(Serial);
     bmp085.begin();
     ina219_Solar.begin();
+    
+    // Configuration Scripts
     configurePins();
+    configureADC();
 
-    // Setup faster ADC 
-    ADCSRA &= ~PS_128;  // remove bits set by Arduino library
-    // you can choose a prescaler from above.
-    // PS_16, PS_32, PS_64 or PS_128
-    ADCSRA |= PS_64;    // set our own prescaler to 64 
-
-    time = millis();
     clear_packet();
 
     delay(2000);
-    transmitPacketHello();
+    transmitPacketHello();  // Say Hello
 
     configureWDT();
 }
@@ -134,6 +127,15 @@ void sampleANDtransmit(void){
     }
 }
 
+void configureADC(){
+
+    // Setup faster ADC 
+    ADCSRA &= ~PS_128;  // remove bits set by Arduino library
+    // you can choose a prescaler from above.
+    // PS_16, PS_32, PS_64 or PS_128
+    ADCSRA |= PS_64;    // set our own prescaler to 64 
+
+}
 void configurePins(){
     #ifdef ANEMOMETER
     pinMode(_PIN_ANEMOMETER0, INPUT);
