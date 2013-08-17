@@ -84,6 +84,8 @@ schema_1 packet;
 #define PACKET_UART 0
 #define PACKET_BIN 1
 const int _CONFIG_PacketFormat = PACKET_BIN; 
+const int _CONFIG_TransmitPeriod = 60;
+long sample_counter = 0; 
 
 void setup() {
     Serial.begin(9600);
@@ -100,8 +102,24 @@ void setup() {
 
     time = millis();
     clear_packet();
-}
 
+    delay(2000);
+    transmitPacketHello();
+
+
+}
+void transmitPacketHello(){
+    if(_CONFIG_PacketFormat == PACKET_BIN)
+    {
+        samplePacketBinary();
+        samplePacketBinary();
+        samplePacketBinary();
+        samplePacketBinary();
+        samplePacketBinary();
+        transmitPacketBinary();
+    }
+
+}
 void clear_packet()
 {
     packet.schema = 1;
@@ -125,15 +143,19 @@ void loop() {
     digitalWrite(_PIN_XBEE_SLEEP, LOW);
     digitalWrite(_PIN_PSWITCH, HIGH);
 
-    if(_CONFIG_PacketFormat == PACKET_UART)
-    {
+    if(_CONFIG_PacketFormat == PACKET_UART) {
+
         samplePacketUART();
         transmitPacketUART();
     }
     else if(_CONFIG_PacketFormat == PACKET_BIN) {
         samplePacketBinary();
-        transmitPacketBinary(); 
-        clear_packet();
+        sample_counter++;
+        if(sample_counter == _CONFIG_TransmitPeriod) {
+            transmitPacketBinary(); 
+            clear_packet();
+            sample_counter = 0;  // Clear the sample counter
+        }
     }
     else {
         // Do nothing 
