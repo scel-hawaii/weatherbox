@@ -79,7 +79,6 @@ void setup() {
     bmp085.begin();
     ina219_Solar.begin();
     configurePins();
-    configureWDT();
 
     // Setup faster ADC 
     ADCSRA &= ~PS_128;  // remove bits set by Arduino library
@@ -108,10 +107,6 @@ void setup() {
 }
 
 void loop() {
-    if(f_wdt == 1)
-    { 
-        // If there is enough voltage
-        if(isEnoughVoltage == TRUE){
             digitalWrite(_PIN_XBEE_SLEEP, LOW);
             digitalWrite(_PIN_PSWITCH, HIGH);
 
@@ -177,44 +172,11 @@ void loop() {
             for (int i = 0; i < sizeof(payload) && s[i] != '\0'; len = ++i) // yikes
                 payload[i] = s[i];
 
-            #ifndef POWERSAVE
-            analogWrite(13, 255);
-            #endif
             ZBTxRequest zbTx = ZBTxRequest(addr64, payload, len);
             xbee.send(zbTx);
             softserial.println(s);
-            #ifndef POWERSAVE
-            analogWrite(13, 0);
-            #endif
-            // delay(14800);
+            delay(1000);
         }
-        else {
-            digitalWrite(_PIN_XBEE_SLEEP, HIGH);
-            digitalWrite(_PIN_PSWITCH, LOW);
-
-            long pureBatt = sampleBatteryVoltage();
-            long smoothBatt = sampleSmoothBatteryV(pureBatt);
-
-            softserial.print("Not Enough Voltage: ");
-            softserial.print("Pure - ");
-            softserial.println(pureBatt);
-            softserial.print("Smooth - ");
-            softserial.println(smoothBatt);
-
-            smooth_batt_mv = smoothBatt;
-
-            if(smooth_batt_mv >= 3750) isEnoughVoltage = TRUE;
-            else isEnoughVoltage = FALSE;
-        }
-        time = millis();
-        while(millis() - time < 50);
-        f_wdt = 0;
-        enterSleep();
-    }
-    else
-    {
-
-    }
     
 }
 
@@ -296,69 +258,4 @@ long sampleSmoothBatteryV(int sample){
 }
 
 
-/***************************************************
- *  Name:        configureWDT
- *  Returns:     Nothing.
- *  Parameters:  None.
- *  Description: configured the Watch Dog timer for the
-                    appropriate settings
- ***************************************************/
-void configureWDT(void){
-    /* Clear the reset flag. */
-    MCUSR &= ~(1<<WDRF);
 
-    /* In order to change WDE or the prescaler, we need to
-     * set WDCE (This will allow updates for 4 clock cycles).
-     */
-    WDTCSR |= (1<<WDCE) | (1<<WDE);
-
-    /* set new watchdog timeout prescaler value */
-    //WDTCSR = 1<<WDP2 | 1<<WDP1; /* 1.0 seconds */
-    //WDTCSR = 1<<WDP3; /* 4.0 seconds */
-    WDTCSR = 1<<WDP3 | 1<<WDP0; /* 8.0 seconds */
-
-    /* Enable the WD interrupt (note no reset). */
-    WDTCSR |= _BV(WDIE);
-
-}
-
-/***************************************************
- *  Name:        ISR(WDT_vect)
- *  Returns:     Nothing.
- *  Parameters:  None.
- *  Description: Watchdog Interrupt Service. This
- *               is executed when watchdog timed out.
- ***************************************************/
-ISR(WDT_vect)
-{
-  if(f_wdt == 0)
-  {
-    f_wdt=1;
-  }
-  else
-  {
-    softserial.println("WDT Overrun!!!");
-  }
-}
-
-/***************************************************
- *  Name:        enterSleep
- *  Returns:     Nothing.
- *  Parameters:  None.
- *  Description: Enters the arduino into sleep mode.
- ***************************************************/
-void enterSleep(void)
-{
-  // set_sleep_mode(SLEEP_MODE_PWR_SAVE);   /* EDIT: could also use SLEEP_MODE_PWR_DOWN for lowest power consumption. */
-  set_sleep_mode(SLEEP_MODE_PWR_DOWN);   
-  sleep_enable();
-  
-  /* Now enter sleep mode. */
-  sleep_mode();
-  
-  /* The program will continue from here after the WDT timeout*/
-  sleep_disable(); /* First thing to do is disable sleep. */
-  
-  /* Re-enable the peripherals. */
-  power_all_enable();
-}
