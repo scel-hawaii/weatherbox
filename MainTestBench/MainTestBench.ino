@@ -18,6 +18,8 @@
 #include <OneWire.h>
 #include <DallasTemperature.h>
 
+#include "schema.h"
+
 #define dataPin 8
 #define clockPin 7
 #define ONE_WIRE_BUS 2
@@ -72,6 +74,16 @@ long sampleSmoothBatteryV(int sample);
 void configureWDT(void);
 void enterSleep(void);
 void configurePins(void);
+String s; 
+
+int len;
+
+uint8_t rf_payload[243];
+schema_1 packet;
+
+#define PACKET_UART 0
+#define PACKET_BIN 1
+const int _CONFIG_PacketFormat = PACKET_UART; 
 
 void setup() {
     Serial.begin(9600);
@@ -86,91 +98,126 @@ void setup() {
     // PS_16, PS_32, PS_64 or PS_128
     ADCSRA |= PS_64;    // set our own prescaler to 64 
 
-    // Take 15 inital sample readings for moving average
-    for( int k = 0 ; k < 15 ; k++) {
-        smooth_batt_array[k] = sampleBatteryVoltage();
-        softserial.print(k);
-        softserial.print(" ");
-        softserial.println(smooth_batt_array[k]);
-    }
-
-    
-    // Double check if battery conditions are okay
-    smooth_batt_mv = sampleSmoothBatteryV(sampleBatteryVoltage());
-    if(smooth_batt_mv < 3700) 
-        isEnoughVoltage = FALSE;
-    else 
-        isEnoughVoltage = TRUE;
-    
-
     time = millis();
 }
 
 void loop() {
-            // Turn on all the sensors and Xbee
-            digitalWrite(_PIN_XBEE_SLEEP, LOW);
-            digitalWrite(_PIN_PSWITCH, HIGH);
+    // Turn on all the sensors and Xbee
+    digitalWrite(_PIN_XBEE_SLEEP, LOW);
+    digitalWrite(_PIN_PSWITCH, HIGH);
 
-            String s = "{";
-            s += "\"address\": ";
-            s += String(address);
-            s += ", \"uptime_ms\": ";
-            s += String(millis());
-            s += ", \"bmp085_temp_decic\": ";
-            bmp085_temp_decic = bmp085.readTemperature()*10;
-            s += String(bmp085_temp_decic);
-            s += ", \"bmp085_press_pa\": ";
-            bmp085_press_pa = bmp085.readPressure();
-            s += String(bmp085_press_pa);
-            s += ", \"batt_mv\": ";
-            softserial.println(smooth_batt_mv);
-            s += String(smooth_batt_mv);
-
-            s += ", \"panel_mv\": ";
-            panel_mv = 2*analogRead(1)*5000.0/1024;
-            s += String(panel_mv);
-            s += ", \"apogee_mv\": ";
-            apogee_mv = analogRead(2)*5000.0/1024;
-            s += String(apogee_mv);
-            s += ", \"apogee_w_m2\": ";
-            apogee_w_m2 = apogee_mv*5.0;
-            s += String(apogee_w_m2);
-
-            s += ", \"panel_ua\": ";
-            panel_ua = ina219_Solar.getCurrent_mA()*1000;
-            s += String(panel_ua);
-
-            s += ", \"dallas_roof_c\": ";
-            dallas_roof_sen.requestTemperatures();
-            dallas_rooftemp_c = dallas_roof_sen.getTempCByIndex(0);
-            s += String(dallas_rooftemp_c);
-
-            s += ", \"dallas_amb_c\": ";
-            dallas_amb_sen.requestTemperatures();
-            dallas_ambtemp_c = dallas_amb_sen.getTempCByIndex(0);
-            s += String(dallas_ambtemp_c);
-            s += "}";
-            s += "       ";		// it explodes without something here... omg wtf
-
-            // s += "blah blah blah";
-
-            // s += "Hath not a Jew eyes? Hath not a Jew hands, organs, dimensions, senses, affections, passions, fed with the same food, hurt with the same weapons, subject to the same diseases, healed by the same means, warmed and cooled by the same winter and summer, as a Christian is? If you prick us, do we not bleed? If you tickle us, do we not laugh? If you poison us, do we not die? And if you wrong us, shall we not revenge?"; // s misbehaves when long
-
-            for (int i = 0; i < sizeof(payload); i++)
-                payload[i] = i % 10 + '0';
-            // payload[i] = '\0';
-
-            int len;
-            for (int i = 0; i < sizeof(payload) && s[i] != '\0'; len = ++i) // yikes
-                payload[i] = s[i];
-
-            ZBTxRequest zbTx = ZBTxRequest(addr64, payload, len);
-            xbee.send(zbTx);
-            softserial.println(s);
-            delay(1000);
-        }
-    
+    if(_CONFIG_PacketFormat == PACKET_UART)
+    {
+        samplePacketUART();
+        transmitPacketUART();
+    }
+    else if(_CONFIG_PacketFormat == PACKET_BIN) {
+        samplePacketBinary();
+        transmitPacketBinary(); 
+    }
+    else {
+        // Do nothing 
+    } 
+    delay(1000);
 }
+
+void samplePacketBinary()
+{
+    if (packet.n < 60)
+    {
+        int n = packet.n;
+        packet.uptime_ms = millis();
+
+        int i; float batt_mv_raw = 0, panel_mv_raw = 0, apogee_raw = 0;
+        // Find the averages of these values 
+        for (i = 0; i < 10; i += 1)
+        {
+            batt_mv_raw += analogRead(_PIN_BATT_V)*5000.0/1023;
+            panel_mv_raw += 2*analogRead(_PIN_SOLAR_V)*5000.0/1023;
+            apogee_raw += analogRead(_PIN_APOGEE_V)*5000.0/1023;
+        }
+        packet.batt_mv[n/4] = batt_mv_raw/10.0;
+        packet.panel_mv[n/4] = panel_mv_raw/10.0;
+        packet.bmp085_press_pa = bmp085.readPressure();
+        packet.bmp085_temp_decic = bmp085.readTemperature()*10;
+        packet.apogee_w_m2[n] = apogee_raw/10.0;
+        packet.n += 1;
+    }
+
+}
+void transmitPacketBinary()
+{
+    // Empty for now
+    memset(rf_payload, '\0', sizeof(rf_payload));
+    memcpy(rf_payload, &packet, sizeof(packet));
+    ZBTxRequest zbTx = ZBTxRequest(addr64, rf_payload, sizeof(packet));
+    xbee.send(zbTx);
+}
+
+void transmitPacketUART()
+{
+    for (int i = 0; i < sizeof(payload); i++)
+        payload[i] = i % 10 + '0';
+    // payload[i] = '\0';
+
+    len = 0; 
+    for (int i = 0; i < sizeof(payload) && s[i] != '\0'; len = ++i) // yikes
+        payload[i] = s[i];
+
+    ZBTxRequest zbTx = ZBTxRequest(addr64, payload, len);
+    xbee.send(zbTx);
+    softserial.println(s);
+}
+
+void samplePacketUART()
+{
+        s = "{";
+        s += "\"address\": ";
+        s += String(address);
+        s += ", \"uptime_ms\": ";
+        s += String(millis());
+        s += ", \"bmp085_temp_decic\": ";
+        bmp085_temp_decic = bmp085.readTemperature()*10;
+        s += String(bmp085_temp_decic);
+        s += ", \"bmp085_press_pa\": ";
+        bmp085_press_pa = bmp085.readPressure();
+        s += String(bmp085_press_pa);
+        s += ", \"batt_mv\": ";
+        softserial.println(smooth_batt_mv);
+        s += String(smooth_batt_mv);
+
+        s += ", \"panel_mv\": ";
+        panel_mv = 2*analogRead(1)*5000.0/1024;
+        s += String(panel_mv);
+        s += ", \"apogee_mv\": ";
+        apogee_mv = analogRead(2)*5000.0/1024;
+        s += String(apogee_mv);
+        s += ", \"apogee_w_m2\": ";
+        apogee_w_m2 = apogee_mv*5.0;
+        s += String(apogee_w_m2);
+
+        s += ", \"panel_ua\": ";
+        panel_ua = ina219_Solar.getCurrent_mA()*1000;
+        s += String(panel_ua);
+
+        s += ", \"dallas_roof_c\": ";
+        dallas_roof_sen.requestTemperatures();
+        dallas_rooftemp_c = dallas_roof_sen.getTempCByIndex(0);
+        s += String(dallas_rooftemp_c);
+
+        s += ", \"dallas_amb_c\": ";
+        dallas_amb_sen.requestTemperatures();
+        dallas_ambtemp_c = dallas_amb_sen.getTempCByIndex(0);
+        s += String(dallas_ambtemp_c);
+        s += "}";
+        s += "       ";		// it explodes without something here... omg wtf
+
+        // s += "blah blah blah";
+
+        // s += "Hath not a Jew eyes? Hath not a Jew hands, organs, dimensions, senses, affections, passions, fed with the same food, hurt with the same weapons, subject to the same diseases, healed by the same means, warmed and cooled by the same winter and summer, as a Christian is? If you prick us, do we not bleed? If you tickle us, do we not laugh? If you poison us, do we not die? And if you wrong us, shall we not revenge?"; // s misbehaves when long
+
+}
+
 
 void configurePins(){
     #ifdef ANEMOMETER
