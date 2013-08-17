@@ -141,10 +141,10 @@ void loop() {
             s += String(smooth_batt_mv);
 
             s += ", \"panel_mv\": ";
-            panel_mv = 2*analogRead(1)*5000.0/1024;
+            panel_mv = 2*analogRead(1)*5000.0/1023;
             s += String(panel_mv);
             s += ", \"apogee_mv\": ";
-            apogee_mv = analogRead(2)*5000.0/1024;
+            apogee_mv = analogRead(2)*5000.0/1023;
             s += String(apogee_mv);
             s += ", \"apogee_w_m2\": ";
             apogee_w_m2 = apogee_mv*5.0;
@@ -156,12 +156,12 @@ void loop() {
 
             s += ", \"dallas_roof_c\": ";
             dallas_roof_sen.requestTemperatures();
-            dallas_rooftemp_c = dallas_roof_sen.getTempCByIndex(0);
+            dallas_rooftemp_c = dallas_roof_sen.getTempCByIndex(0)*100;
             s += String(dallas_rooftemp_c);
 
             s += ", \"dallas_amb_c\": ";
             dallas_amb_sen.requestTemperatures();
-            dallas_ambtemp_c = dallas_amb_sen.getTempCByIndex(0);
+            dallas_ambtemp_c = dallas_amb_sen.getTempCByIndex(0)*100;
             s += String(dallas_ambtemp_c);
             s += "}";
             s += "       ";		// it explodes without something here... omg wtf
@@ -266,7 +266,7 @@ long sampleBatteryVoltage(void){
         temp += analogRead(_PIN_BATT_V); 
     }
     temp = temp/ADC_SAMPLE_NUM;
-    return ((temp*5000.0/1024));
+    return ((temp*5000.0/1023));
 }
 
 /***************************************************

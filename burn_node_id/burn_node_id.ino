@@ -22,8 +22,10 @@ void loop(){
     int i = 0;
     int invalid = 0;
     int done = 0; 
+    Serial.print("Current device's node id: ");
+    Serial.println( (EEPROM.read(2) | (EEPROM.read(3)<<8)) );
 
-    Serial.println("Please enter the node id:");
+    Serial.println("Please enter the node id to burn:");
 
     while(incomingByte[i] != '\n') {
         if(Serial.available() > 0){
