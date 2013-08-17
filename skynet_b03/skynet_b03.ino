@@ -215,6 +215,24 @@ long sampleBatteryVoltage(void){
                     for voltage detection during the 
                     power cutoff point.
  ***************************************************/
+long SmoothBattV_init(void)
+{
+
+
+}
+long SmoothBattV_add(void)
+{
+
+}
+
+long SmoothBattV_get(void)
+{
+
+
+}
+
+
+
 long sampleSmoothBatteryV(int sample){
     double temp;
     /*

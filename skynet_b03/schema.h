@@ -47,5 +47,5 @@ typedef struct {
     int32_t gps_lon;
     int32_t gps_elev;
 
-} schema2;
+} schema_2;
 
