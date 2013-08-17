@@ -1,27 +1,24 @@
 #include "skynet_b03.h"
-#define BATT_SAMPLE_SIZE 15
-// change me!!!11!1
+
 #include <Wire.h>
 #include <Adafruit_BMP085.h>
-
 #include <SoftwareSerial.h>
 #include <XBee.h>
 #include <Adafruit_INA219.h>
 
 #include <EEPROM.h>
-#include "apple_23.h"
 
 #include <avr/sleep.h>
 #include <avr/power.h>
 #include <avr/wdt.h>
-
-#include "sleep.h"
 
 #include <SHT1x.h>
 #include <OneWire.h>
 #include <DallasTemperature.h>
 
 #include "schema.h"
+#include "sleep.h"
+#include "apple_23.h"
 
 #define FALSE 0
 #define TRUE 1
