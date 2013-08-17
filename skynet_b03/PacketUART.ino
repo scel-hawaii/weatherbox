@@ -12,8 +12,9 @@ void samplePacketUART()
         bmp085_press_pa = bmp085.readPressure();
         s += String(bmp085_press_pa);
         s += ", \"batt_mv\": ";
-        softserial.println(smooth_batt_mv);
-        s += String(smooth_batt_mv);
+        batt_mv = sampleBatteryVoltage();
+        softserial.println(batt_mv);
+        s += String(batt_mv);
 
         s += ", \"panel_mv\": ";
         panel_mv = 2*analogRead(1)*5000.0/1024;

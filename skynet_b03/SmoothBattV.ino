@@ -8,19 +8,31 @@
                     for voltage detection during the 
                     power cutoff point.
  ***************************************************/
-long SmoothBattV_init(void) {
+const int MOVING_AVG_SIZE = 15;
+long smooth_batt_array[MOVING_AVG_SIZE];
+long smooth_batt_mv;
 
-
+void SmoothBattV_init(void) {
+    for(int k = 0; k < MOVING_AVG_SIZE ; k++) {
+        smooth_batt_array[k] = sampleBatteryVoltage(); 
+    }
 }
 
-long SmoothBattV_add(void) {
+void SmoothBattV_add(void) {
+    long temp[MOVING_AVG_SIZE];
 
-
+    for(int k = 0; k < MOVING_AVG_SIZE-1 ; k++) {
+        temp[k] = smooth_batt_array[k+1];
+    }
+    temp[MOVING_AVG_SIZE] = sampleBatteryVoltage();
 }
 
 long SmoothBattV_get(void) {
-
-
+    long temp;
+    for(int k = 0; k < MOVING_AVG_SIZE ; k++) {
+        temp += sampleBatteryVoltageRaw();
+    }
+    return (long)((temp/MOVING_AVG_SIZE) * 5000/1023);
 }
 
 long sampleSmoothBatteryV(int sample){
