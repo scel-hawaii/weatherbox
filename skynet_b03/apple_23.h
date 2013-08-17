@@ -35,6 +35,7 @@ const unsigned char PS_32 = (1 << ADPS2) | (1 << ADPS0);
 const unsigned char PS_64 = (1 << ADPS2) | (1 << ADPS1);
 const unsigned char PS_128 = (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0);
 
+#define THRESH_GOOD_BATT_V 3700
 // configuration macros
 #define ADC_SAMPLE_NUM 200
 
