@@ -56,7 +56,7 @@ long apogee_mv, apogee_w_m2;
 long dallas_rooftemp_c, dallas_ambtemp_c;
 
 long time = 0;
-volatile int f_wdt=1;
+volatile int f_wdt = 1;
 
 unsigned int battery;
 unsigned int i;
@@ -89,23 +89,30 @@ void setup() {
 
     delay(2000);
     transmitPacketHello();
+
+    configureWDT();
 }
 void loop() {
     // Turn on all the sensors and Xbee
     digitalWrite(_PIN_XBEE_SLEEP, LOW);
     digitalWrite(_PIN_PSWITCH, HIGH);
 
-    int batteryV = sampleBatteryVoltage();
-    if(batteryV > THRESH_GOOD_BATT_V){
-        sampleANDtransmit();
-        delay(1000);
-    }
-    else{
-        while(batteryV < 3800) {
-            digitalWrite(_PIN_PSWITCH, LOW);
-            batteryV = sampleBatteryVoltage();
-            delay(1000);
+    if(f_wdt == 1)
+    {
+        int batteryV = sampleBatteryVoltage();
+        if(batteryV > THRESH_GOOD_BATT_V){
+            sampleANDtransmit();
+            delay(100);
         }
+        else{
+            while(batteryV < 3800) {
+                digitalWrite(_PIN_PSWITCH, LOW);    
+                batteryV = sampleBatteryVoltage();
+                delay(100);
+            }
+        }
+        f_wdt = 0;
+        enterSleep();
     }
 }
 
