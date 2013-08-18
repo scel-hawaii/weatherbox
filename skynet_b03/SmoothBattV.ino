@@ -1,13 +1,10 @@
-/***************************************************
- *  Name:        sampleSmoothBatteryV
- *  Returns:     smooth battery voltage.
- *  Parameters:  raw unsmooth sample.
- *  Description: Takes the current sample, puts it into
-                    a running average, and spits back out a 
-                    smooth sample. This is primarily used 
-                    for voltage detection during the 
-                    power cutoff point.
- ***************************************************/
+/****************************************************
+ *
+ *          SmoothBattV.ino
+ *          REIS Weatherbox - Smooth Battery Voltage Functions
+ *
+ ****************************************************/
+
 const int MOVING_AVG_SIZE = 15;
 long smooth_batt_array[MOVING_AVG_SIZE];
 long smooth_batt_mv;
@@ -35,6 +32,16 @@ long SmoothBattV_get(void) {
     return (long)((temp/MOVING_AVG_SIZE) * 5000/1023);
 }
 
+/***************************************************
+ *  Name:        sampleSmoothBatteryV
+ *  Returns:     smooth battery voltage.
+ *  Parameters:  raw unsmooth sample.
+ *  Description: Takes the current sample, puts it into
+                    a running average, and spits back out a 
+                    smooth sample. This is primarily used 
+                    for voltage detection during the 
+                    power cutoff point.
+ ***************************************************/
 long sampleSmoothBatteryV(int sample){
     double temp;
     /*
