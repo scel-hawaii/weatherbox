@@ -1,4 +1,14 @@
-void clear_packet()
+
+/***************************************************
+ *  Name:        clear_packet()
+ *  Returns:     nothing
+ *  Parameters:  None.
+ *  Description: 
+ *  
+ *  This function zeros out the binary packet before transmission
+ *
+ ***************************************************/
+void clear_packet(void)
 {
     packet.schema = 1;
     packet.address = address;
@@ -16,6 +26,21 @@ void clear_packet()
 	packet.apogee_w_m2[i] = 0;
     }
 }
+/***************************************************
+ *  Name:        samplePacketBinary()
+ *  Returns:     nothing
+ *  Parameters:  None.
+ *  Description: 
+ *  
+ *  This function samples, and stuffs the results into a binary packet.
+ *  The binary packet format can take up to 60 samples, each subsequeunt sample 
+ *  iterates the number of data points, allowing us to keep track of how many
+ *  samples we've already taken. The sample function takes care of the stacking. 
+ * 
+ *  Solar irradance is sampled each second, and the other less important data 
+ *  points can are sampled less frequently.
+ *
+ ***************************************************/
 void samplePacketBinary()
 {
     if (packet.n < 60)
@@ -40,6 +65,17 @@ void samplePacketBinary()
     }
 
 }
+/***************************************************
+ *  Name:        transmitPacketBinary()
+ *  Returns:     nothing
+ *  Parameters:  None.
+ *  Description: 
+ *  
+ *  Takes our packet data structure and then uses the Xbee Arduino API
+ *  to package and send that data to the xbee. More information on the 
+ *  Xbee library for arduino can be found online.
+ *
+ ***************************************************/
 void transmitPacketBinary()
 {
     // Empty for now
