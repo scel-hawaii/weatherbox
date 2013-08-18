@@ -119,6 +119,16 @@ void loop() {
     }
 }
 
+/***************************************************
+ *  Name:        sampleANDtransmit
+ *  Returns:     nothing
+ *  Parameters:  None.
+ *  Description: One sample and transmit function. This function
+ *                  takes care of the logic behind the different modes,
+ *                  and executes it when needed.
+ *
+ *
+ ***************************************************/
 void sampleANDtransmit(void){
     switch(_CONFIG_PacketFormat){
         case PACKET_UART:
@@ -139,7 +149,17 @@ void sampleANDtransmit(void){
     }
 }
 
-void configureADC(){
+/***************************************************
+ *  Name:        configureADC
+ *  Returns:     nothing
+ *  Parameters:  None.
+ *  Description: configures the ADC. Normally, in the arduino 
+                    IDE, we don't have to worry about this, but 
+                    we change the registers to speed up the
+                    ADC sample times a little. More docuementation
+                    available online.
+ ***************************************************/
+void configureADC(void){
 
     // Setup faster ADC 
     ADCSRA &= ~PS_128;  // remove bits set by Arduino library
@@ -148,7 +168,16 @@ void configureADC(){
     ADCSRA |= PS_64;    // set our own prescaler to 64 
 
 }
-void configurePins(){
+
+/***************************************************
+ *  Name:        configurePins
+ *  Returns:     nothing
+ *  Parameters:  None.
+ *  Description: Configures the default pin states to make sure
+                    there isn't any strange behavior or 
+                    unneeded power draw
+ ***************************************************/
+void configurePins(void){
     #ifdef ANEMOMETER
     pinMode(_PIN_ANEMOMETER0, INPUT);
     pinMode(_PIN_ANEMOMETER1, OUTPUT);
