@@ -93,16 +93,17 @@ void setup() {
     transmitPacketHello();  // Say Hello
 
     configureWDT();
+    digitalWrite(_PIN_PSWITCH, HIGH);
 }
 void loop() {
     // Turn on all the sensors and Xbee
     digitalWrite(_PIN_XBEE_SLEEP, LOW);
-    digitalWrite(_PIN_PSWITCH, HIGH);
 
     if(f_wdt == 1)
     {
         int batteryV = sampleBatteryVoltage();
         if(batteryV > THRESH_GOOD_BATT_V){
+            digitalWrite(_PIN_PSWITCH, HIGH);
             sampleANDtransmit();
             delay(100);
         }
