@@ -41,7 +41,7 @@ void clear_packet(void)
  *  points can are sampled less frequently.
  *
  ***************************************************/
-void samplePacketBinary()
+void samplePacketBinary(void)
 {
     if (packet.n < 60)
     {

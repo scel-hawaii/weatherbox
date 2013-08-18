@@ -1,4 +1,15 @@
-void samplePacketUART()
+
+/***************************************************
+ *  Name:        samplePacketUART()
+ *  Returns:     nothing
+ *  Parameters:  None.
+ *  Description: 
+ *  
+ *  Samples for the packet using a string. The string is actually a JSON 
+ *  packet format, and can be parsed later on the server side code. 
+ *
+ ***************************************************/
+void samplePacketUART(void)
 {
         s = "{";
         s += "\"address\": ";
@@ -48,6 +59,16 @@ void samplePacketUART()
 
 }
 
+/***************************************************
+ *  Name:        transmitPacketUART()
+ *  Returns:     nothing
+ *  Parameters:  None.
+ *  Description: 
+ *  
+ *  Transmits the string using the Xbee Arduino library. More info
+ *  on the Xbee Arduino Library can be found online.
+ *
+ ***************************************************/
 void transmitPacketUART()
 {
     for (int i = 0; i < sizeof(payload); i++)
