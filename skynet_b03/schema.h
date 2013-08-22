@@ -1,3 +1,16 @@
+/****************************************************
+ *
+ *          schema.h
+ *
+ *          This file contains the structure for our packet schema. The 
+ *          Packet schema keeps all of the variables for the functions 
+ *          which we'll send to the Xbee API to get transmitted. 
+ *          
+ *          Note: when a new packet schema is made, create a new 
+ *          structure.
+ *          
+ *
+ ****************************************************/
 typedef struct {
 
     uint16_t schema;
