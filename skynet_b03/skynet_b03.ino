@@ -76,6 +76,14 @@ schema_1 packet;
 
 long sample_counter = 0; 
 
+
+/***************************************************
+ *      setup()
+ *
+ *      This function is run once at the beginning of the start
+ *      sequence, before the setup function. Put any init scripts 
+ *      you may need in here. 
+ ***************************************************/
 void setup() {
     Serial.begin(9600);
 
@@ -95,23 +103,34 @@ void setup() {
     configureWDT();
     digitalWrite(_PIN_PSWITCH, HIGH);
 }
+
+/***************************************************
+ *      loop()
+ *
+ *      This function is the main program function, running
+ *      constantly. It is executed after the setup() function, and
+ *      continues running indefinately until certain conditions
+ *      stop it. Analogous to the main() function in traditional 
+ *      C and C++ programs
+ ***************************************************/
 void loop() {
     // Turn on all the sensors and Xbee
     digitalWrite(_PIN_XBEE_SLEEP, LOW);
 
+    // Check the watchdog timer flag 
     if(f_wdt == 1)
     {
         int batteryV = sampleBatteryVoltage();
         if(batteryV > THRESH_GOOD_BATT_V){
             digitalWrite(_PIN_PSWITCH, HIGH);
             sampleANDtransmit();
-            delay(100);
+            delay(100);                             // Delay and wait for transmit to finish
         }
         else{
             while(batteryV < 3800) {
                 digitalWrite(_PIN_PSWITCH, LOW);    
                 batteryV = sampleBatteryVoltage();
-                delay(100);
+                delay(100);                         // Wait 100 ms for everything to settle
             }
         }
         f_wdt = 0;
@@ -246,6 +265,16 @@ long sampleBatteryVoltage(void){
     return ((temp*5000.0/1023));
 }
 
+
+
+/***************************************************
+ *  Name:        sampleBatteryVoltageRaw
+ *  Returns:     an averaged battery voltage.
+ *  Parameters:  None.
+ *  Description: like sampleBatteryVoltage() but returns a raw ADC 
+ *                  value instead. May be useful later for saving
+ *                  calculations
+ ***************************************************/
 double sampleBatteryVoltageRaw(void){
     double temp;
     for(i = 0; i < ADC_SAMPLE_NUM ; i++) {

@@ -34,14 +34,14 @@ void configureWDT(void){
  ***************************************************/
 ISR(WDT_vect)
 {
-  if(f_wdt == 0)
-  {
-    f_wdt=1;
-  }
-  else
-  {
-    softserial.println("WDT Overrun!!!");
-  }
+    if(f_wdt == 0)
+    {
+        f_wdt=1;
+    }
+    else
+    {
+        softserial.println("WDT Overrun!!!");
+    }
 }
 
 /***************************************************
@@ -52,7 +52,11 @@ ISR(WDT_vect)
  ***************************************************/
 void enterSleep(void)
 {
-  // set_sleep_mode(SLEEP_MODE_PWR_SAVE);   /* EDIT: could also use SLEEP_MODE_PWR_DOWN for lowest power consumption. */
+  /* EDIT: could also use SLEEP_MODE_PWR_DOWN for lowest power consumption. 
+     Information on other sleep modes can be found on the arduino website.
+  */
+  
+  // set_sleep_mode(SLEEP_MODE_PWR_SAVE);   
   set_sleep_mode(SLEEP_MODE_PWR_DOWN);   
   sleep_enable();
   
