@@ -1,3 +1,13 @@
+/**************************************************** *
+ *          sleep.ino
+ *          
+ *          This file contains the watchdog interrupt service
+ *          routine, as well as some other relevant sleep functions.
+ *          The sleep modes allow us to save some power on the 
+ *          microcontroller, since we aren't processing 100% of the time.
+ *
+ ****************************************************/
+#include "sleep.h"
 
 /***************************************************
  *  Name:        configureWDT
