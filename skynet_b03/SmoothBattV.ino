@@ -3,6 +3,12 @@
  *          SmoothBattV.ino
  *          REIS Weatherbox - Smooth Battery Voltage Functions
  *
+ *          This file contains the functions for a moving 
+ *          average voltage filter. The filter is used to 
+ *          calculate the cutoff voltages for the low battery check,
+ *          since our ADC input has a lot of noise. 
+ *      
+ *
  ****************************************************/
 
 const int MOVING_AVG_SIZE = 15;
