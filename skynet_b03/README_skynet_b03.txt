@@ -12,6 +12,10 @@ Major version changes:
 
 Major Changelog (See git log for minor notes):
 ----------------------------------------------
+8/22/13 - Sean Hara
+
+Test Update.
+
 8/16/13 - Kenny Luong
 
 Found out that the binary packet isn't comptible with the 
