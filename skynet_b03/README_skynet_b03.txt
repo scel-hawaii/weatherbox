@@ -12,6 +12,10 @@ Major version changes:
 
 Major Changelog (See git log for minor notes):
 ----------------------------------------------
+8/23/13 - Sean Hara
+
+BETTER better test update.
+
 8/22/13 - Zachary Dorman
 
 Better test update.
