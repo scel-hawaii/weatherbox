@@ -14,13 +14,13 @@
 typedef struct {
 
     uint16_t schema;
-    uint16_t address;
+    uint16_t address;	
     uint32_t uptime_ms;
     uint8_t n;			// number of data points in packet 0..30
-    uint16_t batt_mv[15];
-    uint16_t panel_mv[15];
-    uint32_t bmp085_press_pa;
-    int16_t bmp085_temp_decic;
+    uint16_t batt_mv[15];	// Battery Voltage (in milli volts)
+    uint16_t panel_mv[15];	// Panel Voltage (in milli volts)
+    uint32_t bmp085_press_pa;	// Pressure Value (in pascals)
+    int16_t bmp085_temp_decic;  // Temperature Value (in celsius)
     uint16_t humidity_centi_pct;
     uint16_t apogee_w_m2[60];
 
