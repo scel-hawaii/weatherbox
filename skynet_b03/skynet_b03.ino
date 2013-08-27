@@ -85,6 +85,9 @@ void setup() {
 
     configureWDT();
     digitalWrite(_PIN_PSWITCH, HIGH);
+
+    // Turn on all the sensors and Xbee
+    digitalWrite(_PIN_XBEE_SLEEP, LOW);
 }
 
 /***************************************************
@@ -97,9 +100,6 @@ void setup() {
  *      C and C++ programs
  ***************************************************/
 void loop() {
-    // Turn on all the sensors and Xbee
-    digitalWrite(_PIN_XBEE_SLEEP, LOW);
-
     // Check the watchdog timer flag 
     if(f_wdt == 1)
     {
