@@ -37,6 +37,7 @@ SoftwareSerial softserial(9, 10);
 XBee xbee = XBee();
 XBeeAddress64 addr64 = XBeeAddress64(0, 0);
 
+// Payload used for PacketUART transmission
 uint8_t payload[243];
 
 // Grab the address from the Arduino EEPROM 
@@ -51,13 +52,18 @@ long dallas_rooftemp_c, dallas_ambtemp_c;
 unsigned int i;
 unsigned int pMode;
 
+// string used for PacketUART
 String s; 
 
+// length of payload (used in PacketUART) 
 int len;
 
+// payload used for PacketBINARY transmission
 uint8_t rf_payload[243];
+
 schema_1 packet;
 
+// count number of samples taken
 long sample_counter = 0; 
 
 /***************************************************
