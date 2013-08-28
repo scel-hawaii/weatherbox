@@ -90,10 +90,6 @@ void setup() {
     transmitPacketHello();  // Say Hello
 
     configureWDT();
-    digitalWrite(_PIN_PSWITCH, HIGH);
-
-    // Turn on all the sensors and Xbee
-    digitalWrite(_PIN_XBEE_SLEEP, LOW);
 }
 
 /***************************************************
