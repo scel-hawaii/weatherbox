@@ -42,8 +42,8 @@ const unsigned char PS_128 = (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0);
 #define PACKET_UART 0
 #define PACKET_BIN 1
 
-const int _CONFIG_PacketFormat = PACKET_BIN; 
-const int _CONFIG_TransmitPeriod = 60;
+const int _CONFIG_PacketFormat = PACKET_BIN; // determines which packet is used
+const int _CONFIG_TransmitPeriod = 60; // determines how often samples transmit
 
 #define pMode_NORMAL 0
 #define pMode_POWERSAVE 1
