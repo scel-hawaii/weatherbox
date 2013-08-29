@@ -54,7 +54,9 @@ void samplePacketBinary(void)
         int n = packet.n;
         packet.uptime_ms = millis();
 
+	// initialize values
         int i; float batt_mv_raw = 0, panel_mv_raw = 0, apogee_raw = 0;
+
         // Find the averages of these values 
         for (i = 0; i < 10; i += 1)
         {
@@ -62,6 +64,8 @@ void samplePacketBinary(void)
             panel_mv_raw += 2*analogRead(_PIN_SOLAR_V)*5000.0/1023;
             apogee_raw += analogRead(_PIN_APOGEE_V)*5000.0/1023;
         }
+
+	// Save values to packet
         packet.batt_mv[n/4] = batt_mv_raw/10.0;
         packet.panel_mv[n/4] = panel_mv_raw/10.0;
         packet.bmp085_press_pa = bmp085.readPressure();
