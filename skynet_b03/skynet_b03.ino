@@ -49,7 +49,7 @@ long bmp085_press_pa;
 long apogee_mv, apogee_w_m2;
 long dallas_rooftemp_c, dallas_ambtemp_c;
 
-unsigned int i;
+unsigned int i; // generic counter
 unsigned int pMode;
 
 // string used for PacketUART
@@ -74,6 +74,7 @@ long sample_counter = 0;
  *      you may need in here. 
  ***************************************************/
 void setup() {
+    // sets speed for communication
     Serial.begin(9600);
 
     xbee.begin(Serial);
@@ -86,6 +87,7 @@ void setup() {
 
     clear_packet();
 
+    // Wait to make sure configuration finishes
     delay(2000);
     transmitPacketHello();  // Say Hello
 
@@ -134,6 +136,7 @@ void loop() {
  *
  ***************************************************/
 void sampleANDtransmit(void){
+    // Check which method to transmit packet
     switch(_CONFIG_PacketFormat){
         case PACKET_UART:
             samplePacketUART();
@@ -142,6 +145,7 @@ void sampleANDtransmit(void){
         case PACKET_BIN:
             samplePacketBinary();
             sample_counter++;
+	    // Check if desired amount of samples for transmit have been taken
             if(sample_counter == _CONFIG_TransmitPeriod) {
                 transmitPacketBinary(); 
                 clear_packet();
