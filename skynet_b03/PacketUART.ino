@@ -81,6 +81,7 @@ void transmitPacketUART()
         payload[i] = i % 10 + '0';
     // payload[i] = '\0';
 
+    // payload length init
     len = 0; 
     for (int i = 0; i < sizeof(payload) && s[i] != '\0'; len = ++i) // yikes
         payload[i] = s[i];
