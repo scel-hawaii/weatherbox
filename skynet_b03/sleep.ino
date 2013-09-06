@@ -7,7 +7,6 @@
  *          microcontroller, since we aren't processing 100% of the time.
  *
  ****************************************************/
-#include "sleep.h"
 
 /***************************************************
  *  Name:        configureWDT
