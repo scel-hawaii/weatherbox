@@ -7,7 +7,8 @@
  *          which we'll send to the Xbee API to get transmitted. 
  *          
  *          Note: when a new packet schema is made, create a new 
- *          structure.
+ *          structure. BINARY packet is position dependent on where
+ *	    everything is placed and sent.
  *          
  *
  ****************************************************/
