@@ -17,6 +17,7 @@
 /* Can't move libraries into skynet_b03.h. For some reason the program will 
    not compile if that happens. */
 
+// explain what libraries are for and where to find them
 #include <Wire.h>
 #include <Adafruit_BMP085.h>
 #include <SoftwareSerial.h>
@@ -131,12 +132,14 @@ void loop() {
             digitalWrite(_PIN_PSWITCH, HIGH);
             sampleANDtransmit();
             delay(100);                             // Delay and wait for transmit to finish
+	    					    // Implement interrupt flag instead of delay
         }
         else{
             while(batteryV < 3800) {
                 digitalWrite(_PIN_PSWITCH, LOW);    
                 batteryV = sampleBatteryVoltage();
                 delay(100);                         // Wait 100 ms for everything to settle
+						    // sleep for 10 min instead of delay
             }
         }
         f_wdt = 0;
@@ -156,6 +159,7 @@ void loop() {
  ***************************************************/
 void sampleANDtransmit(void){
     // Check which method for transmitting packet
+    // use ifdef instead of switch
     switch(_CONFIG_PacketFormat){
         case PACKET_UART:
             samplePacketUART();
