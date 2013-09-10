@@ -160,12 +160,11 @@ void loop() {
 void sampleANDtransmit(void){
     // Check which method for transmitting packet
     // use ifdef instead of switch
-    switch(_CONFIG_PacketFormat){
-        case PACKET_UART:
+#ifdef PACKET_U:
             samplePacketUART();
             transmitPacketUART();
-            break;
-        case PACKET_BIN:
+#endif
+#ifdef PACKET_BINARY:
             samplePacketBinary();
             sample_counter++;
 	    // Check if desired amount of samples for transmit have been taken
@@ -174,10 +173,7 @@ void sampleANDtransmit(void){
                 clear_packet();
                 sample_counter = 0;  // Clear the sample counter
             }
-            break;
-        default:
-            break;
-    }
+#endif
 }
 
 /***************************************************
