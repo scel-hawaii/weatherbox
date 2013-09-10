@@ -39,6 +39,9 @@ const unsigned char PS_128 = (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0);
 // configuration macros
 #define ADC_SAMPLE_NUM 200 // number of samples taken for averaging 
 
+//#define PACKET_U
+#define PACKET_BINARY
+
 #define PACKET_UART 0
 #define PACKET_BIN 1
 
