@@ -19,7 +19,7 @@ void setup()
   Serial.begin(9600);
   
   //initialize start of array to packet header
-  Rx[0] = 126;
+  Rx[0] = _start_byte;
 }
 
 
