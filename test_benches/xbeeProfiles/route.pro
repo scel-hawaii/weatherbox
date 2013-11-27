@@ -24,7 +24,7 @@ XB24-ZB_23A7.mxi
 [A]PM=1
 [A]EE=0
 [A]EO=0
-[A]BD=3
+[A]BD=6
 [A]D7=1
 [A]D6=0
 [A]AP=2

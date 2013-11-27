@@ -17,7 +17,7 @@ XB24-ZB_21A7.mxi
 [A]PL=4
 [A]PM=1
 [A]EO=0
-[A]BD=3
+[A]BD=6
 [A]D7=1
 [A]AP=2
 [A]SP=20
