@@ -125,7 +125,7 @@ void loop() {
         }
         transmitPacketBinary();
         clear_packet();
-        delay(1000);
+        delay(2000);
     }
 }
 
