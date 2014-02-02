@@ -36,7 +36,6 @@ void loop()
       Serial.print("\nSize of Packet: ");
       Serial.println(ZBrx.getDataLength());
       Serial.println();
-      }
     }
   }
 }
