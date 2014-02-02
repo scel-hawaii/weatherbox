@@ -44,6 +44,7 @@ void loop()
   
   // Initialize packet to 0
   memset(payload, '\0', sizeof(payload));
+
   // Copy data into packet
   memcpy(payload, &packet, sizeof(packet));
 
