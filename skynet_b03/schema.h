@@ -12,6 +12,12 @@
  *          
  *
  ****************************************************/
+
+/*
+ * 
+ * Schema 1 
+ * 
+ */
 typedef struct {
 
     uint16_t schema;
@@ -66,3 +72,24 @@ typedef struct {
     int16_t panel_ua[15];
 
 } schema_2;
+
+
+
+/* Schema 3 
+ * 
+ * Updated by Sean on the week of Jan 27, 2014
+ *
+ */ 
+typedef struct {
+    uint16_t schema;
+    uint16_t address;       // Address of Arduino
+    uint32_t uptime_ms;     // Time since start of program
+    uint8_t n;          // number of data points in packet 0..30
+    uint16_t batt_mv[6];    // Battery Voltage (in milli volts)
+    uint16_t panel_mv[6];   // Panel Voltage (in milli volts)
+    uint32_t bmp085_press_pa;   // Pressure Value (in pascals)
+    int16_t bmp085_temp_decic;  // Temperature Value (in celsius)
+    uint16_t humidity_centi_pct;
+    uint16_t apogee_w_m2[20];
+} schema_3;
+
