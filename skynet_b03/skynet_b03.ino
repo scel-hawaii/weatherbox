@@ -86,6 +86,7 @@ schema_3 packet;
 
 // count number of samples taken
 long sample_counter = 0; 
+long transmit_timer = 0; 
 
 /***************************************************
  *      setup()
@@ -127,19 +128,40 @@ void setup() {
  *      C and C++ programs
  ***************************************************/
 void loop() {
-    // Check the watchdog timer flag
+    while(1){
+        // Run the barebones routine forever
+        transmit_timer = millis();
+        barebones_routine();
+    }
+}
+
+void barebones_routine(){
+    // sample and then increment the sample counter
     samplePacketBinary();
 	sample_counter++;
-    Serial.print("Current sample counter: ");
+
+    #ifdef DEBUG
+    Serial.println("Sample count: ");
     Serial.println(sample_counter);
+    #endif
+
 	if(sample_counter >= 60) {
+        #ifdef DEBUG
         Serial.println("Transmitting!");
+        #endif
+
         transmitPacketBinary(); 
 	    clear_packet();
 	    sample_counter = 0;
 	}
-	delay(1000);
+
+    // If it hasn't passed the wait time yet we wait, 
+    // and once it has passed, we reset that timer again.
+    // This way, we sample exactly every second
+    int wait_millis = 1000;
+    while( (millis() -  transmit_timer) <= wait_millis );
 }
+
 
 /***************************************************
  *  Name:        sampleANDtransmit
