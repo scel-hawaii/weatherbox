@@ -1,3 +1,19 @@
+/* =========================================================
+ *
+ *
+ *      Apple 2.3 Configuration 
+ *
+ *      This file sets the main hardware configuration options 
+ *      for apple 2.3
+ * =========================================================
+ */
+#define APPLE_VERSION 23
+
+// Define different operation modes here
+#define TESTBENCH_DEBUG
+#define DEBUG
+// #define NORMAL_OPERATION
+
 // pins!
 #define _PIN_ANEMOMETER0 A0
 #define _PIN_ANEMOMETER1 10
@@ -29,13 +45,8 @@
 #define _PIN_SDA A4
 #define _PIN_SCL A5
 
-// Define various ADC prescaler
-const unsigned char PS_16 = (1 << ADPS2);
-const unsigned char PS_32 = (1 << ADPS2) | (1 << ADPS0);
-const unsigned char PS_64 = (1 << ADPS2) | (1 << ADPS1);
-const unsigned char PS_128 = (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0);
-
 #define THRESH_GOOD_BATT_V 3750 // in milli volts
+
 // configuration macros
 #define ADC_SAMPLE_NUM 200 // number of samples taken for averaging 
 
