@@ -93,9 +93,5 @@ typedef struct {
     uint32_t bmp085_press_pa;   // Pressure Value (in pascals)
     int16_t bmp085_temp_decic;  // Temperature Value (in celsius)
     uint16_t apogee_w_m2[20];
-
-    // Humidity isn't included with this version
-    // uint16_t humidity_centi_pct;
-
 } schema_3;
 
