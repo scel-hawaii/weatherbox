@@ -52,7 +52,7 @@ SHT1x sht1x(_PIN_HUMID_DATA, _PIN_HUMID_CLK);
 Adafruit_BMP085 bmp085;
 Adafruit_INA219 ina219_Solar;
 
-SoftwareSerial softserial(9, 10);
+SoftwareSerial softserial(12, 11);
 
 XBee xbee = XBee();
 XBeeAddress64 addr64 = XBeeAddress64(0, 0);
@@ -81,7 +81,8 @@ int len;
 // payload used for PacketBINARY transmission
 uint8_t rf_payload[243];
 
-schema_1 packet;
+//schema_1 packet;
+schema_3 packet;
 
 // count number of samples taken
 long sample_counter = 0; 
@@ -96,22 +97,24 @@ long sample_counter = 0;
 void setup() {
     // sets speed for communication
     Serial.begin(9600);
-
-    xbee.begin(Serial);
+    softserial.begin(9600);
+    xbee.begin(softserial);
     bmp085.begin();
     ina219_Solar.begin();
     
     // Configuration Scripts
     configurePins();
-    configureADC();
+
+    // Disabled by Kenny on 02/07/14
+    // configureADC();
 
     clear_packet();
 
     // Wait to make sure configuration finishes
     delay(2000);
-    transmitPacketHello();  // Say Hello
 
-    configureWDT();
+    // Disabled by Kenny on 02/07/14
+    // configureWDT();
 }
 
 /***************************************************
@@ -124,27 +127,18 @@ void setup() {
  *      C and C++ programs
  ***************************************************/
 void loop() {
-    // Check the watchdog timer flag 
-    if(f_wdt == 1)
-    {
-        int batteryV = sampleBatteryVoltage();
-        if(batteryV > THRESH_GOOD_BATT_V){
-            digitalWrite(_PIN_PSWITCH, HIGH);
-            sampleANDtransmit();
-            delay(100);                             // Delay and wait for transmit to finish
-	    					    // Implement interrupt flag instead of delay
-        }
-        else{
-            while(batteryV < 3800) {
-                digitalWrite(_PIN_PSWITCH, LOW);    
-                batteryV = sampleBatteryVoltage();
-                delay(100);                         // Wait 100 ms for everything to settle
-						    // sleep for 10 min instead of delay
-            }
-        }
-        f_wdt = 0;
-        enterSleep();
-    }
+    // Check the watchdog timer flag
+    samplePacketBinary();
+	sample_counter++;
+    Serial.print("Current sample counter: ");
+    Serial.println(sample_counter);
+	if(sample_counter >= 60) {
+        Serial.println("Transmitting!");
+        transmitPacketBinary(); 
+	    clear_packet();
+	    sample_counter = 0;
+	}
+	delay(1000);
 }
 
 /***************************************************
@@ -167,7 +161,7 @@ void sampleANDtransmit(void){
 #ifdef PACKET_BINARY:
             samplePacketBinary();
             sample_counter++;
-	    // Check if desired amount of samples for transmit have been taken
+	        // Check if desired amount of samples for transmit have been taken
             if(sample_counter == _CONFIG_TransmitPeriod) {
                 transmitPacketBinary(); 
                 clear_packet();
@@ -215,14 +209,14 @@ void configurePins(void){
     #ifndef ANEMOMETER
     pinMode(_PIN_ANEMOMETER0, OUTPUT);
     pinMode(_PIN_ANEMOMETER1, OUTPUT);
-    pinMode(_PIN_ANEMOMETER2, OUTPUT);
-    pinMode(_PIN_ANEMOMETER3, OUTPUT);
+    // pinMode(_PIN_ANEMOMETER2, OUTPUT);
+    // pinMode(_PIN_ANEMOMETER3, OUTPUT);
     pinMode(9, OUTPUT);
     digitalWrite(9, LOW); 
     digitalWrite(_PIN_ANEMOMETER0, LOW); 
     digitalWrite(_PIN_ANEMOMETER1, LOW); 
-    digitalWrite(_PIN_ANEMOMETER2, LOW); 
-    digitalWrite(_PIN_ANEMOMETER3, LOW); 
+    // digitalWrite(_PIN_ANEMOMETER2, LOW); 
+    // digitalWrite(_PIN_ANEMOMETER3, LOW); 
     #endif
 
     
