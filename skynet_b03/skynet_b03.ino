@@ -52,7 +52,10 @@ SHT1x sht1x(_PIN_HUMID_DATA, _PIN_HUMID_CLK);
 Adafruit_BMP085 bmp085;
 Adafruit_INA219 ina219_Solar;
 
-SoftwareSerial softserial(9, 10);
+#ifdef TESTBENCH_DEBUG
+SoftwareSerial softserial(12, 11);
+#else
+#endif
 
 XBee xbee = XBee();
 XBeeAddress64 addr64 = XBeeAddress64(0, 0);
@@ -81,10 +84,12 @@ int len;
 // payload used for PacketBINARY transmission
 uint8_t rf_payload[243];
 
-schema_1 packet;
+//schema_1 packet;
+schema_3 packet;
 
 // count number of samples taken
 long sample_counter = 0; 
+long transmit_timer = 0; 
 
 /***************************************************
  *      setup()
@@ -94,24 +99,46 @@ long sample_counter = 0;
  *      you may need in here. 
  ***************************************************/
 void setup() {
-    // sets speed for communication
+    // Set the communication speeds
     Serial.begin(9600);
 
+    #ifdef DEBUG
+    Serial.println("Begin program!");
+    #endif
+    
+    // Initalize the Xbee depending on which mode we're set to.
+    // The TESTBENCH_DEBUG mode assumes we're using software
+    // serial for the xbee
+
+    #ifdef TESTBENCH_DEBUG 
+    softserial.begin(9600);
+    xbee.begin(softserial);
+    #else
     xbee.begin(Serial);
+    #endif
+
     bmp085.begin();
     ina219_Solar.begin();
     
     // Configuration Scripts
     configurePins();
-    configureADC();
 
+    // Disabled by Kenny on 02/07/14
+    // configureADC();
+
+    // Initialize the packet!
     clear_packet();
 
-    // Wait to make sure configuration finishes
-    delay(2000);
-    transmitPacketHello();  // Say Hello
+    #ifdef DEBUG
+    Serial.println("Wait for configuration set..");
+    #endif
 
-    configureWDT();
+    // Wait to make sure configuration finishes
+    delay(1000);
+    Serial.println("Finished with setup!");
+
+    // Disabled by Kenny on 02/07/14
+    // configureWDT();
 }
 
 /***************************************************
@@ -124,28 +151,40 @@ void setup() {
  *      C and C++ programs
  ***************************************************/
 void loop() {
-    // Check the watchdog timer flag 
-    if(f_wdt == 1)
-    {
-        int batteryV = sampleBatteryVoltage();
-        if(batteryV > THRESH_GOOD_BATT_V){
-            digitalWrite(_PIN_PSWITCH, HIGH);
-            sampleANDtransmit();
-            delay(100);                             // Delay and wait for transmit to finish
-	    					    // Implement interrupt flag instead of delay
-        }
-        else{
-            while(batteryV < 3800) {
-                digitalWrite(_PIN_PSWITCH, LOW);    
-                batteryV = sampleBatteryVoltage();
-                delay(100);                         // Wait 100 ms for everything to settle
-						    // sleep for 10 min instead of delay
-            }
-        }
-        f_wdt = 0;
-        enterSleep();
+    while(1){
+        // Run the barebones routine forever
+        transmit_timer = millis();
+        barebones_routine();
     }
 }
+
+void barebones_routine(){
+    // sample and then increment the sample counter
+    samplePacketBinary();
+	sample_counter++;
+
+    #ifdef DEBUG
+    Serial.print("Sample count: ");
+    Serial.println(sample_counter);
+    #endif
+
+	if(sample_counter >= 60) {
+        #ifdef DEBUG
+        Serial.println("Transmitting!");
+        #endif
+
+        transmitPacketBinary(); 
+	    clear_packet();
+	    sample_counter = 0;
+	}
+
+    // If it hasn't passed the wait time yet we wait, 
+    // and once it has passed, we reset that timer again.
+    // This way, we sample exactly every second
+    int wait_millis = 1000;
+    while( (millis() -  transmit_timer) <= wait_millis );
+}
+
 
 /***************************************************
  *  Name:        sampleANDtransmit
@@ -167,7 +206,7 @@ void sampleANDtransmit(void){
 #ifdef PACKET_BINARY:
             samplePacketBinary();
             sample_counter++;
-	    // Check if desired amount of samples for transmit have been taken
+	        // Check if desired amount of samples for transmit have been taken
             if(sample_counter == _CONFIG_TransmitPeriod) {
                 transmitPacketBinary(); 
                 clear_packet();
@@ -176,25 +215,6 @@ void sampleANDtransmit(void){
 #endif
 }
 
-/***************************************************
- *  Name:        configureADC
- *  Returns:     nothing
- *  Parameters:  None.
- *  Description: configures the ADC. Normally, in the arduino 
-                    IDE, we don't have to worry about this, but 
-                    we change the registers to speed up the
-                    ADC sample times a little. More docuementation
-                    available online.
- ***************************************************/
-void configureADC(void){
-
-    // Setup faster ADC 
-    ADCSRA &= ~PS_128;  // remove bits set by Arduino library
-    // you can choose a prescaler from above.
-    // PS_16, PS_32, PS_64 or PS_128
-    ADCSRA |= PS_64;    // set our own prescaler to 64 
-
-}
 
 /***************************************************
  *  Name:        configurePins
@@ -213,16 +233,19 @@ void configurePins(void){
     #endif
 
     #ifndef ANEMOMETER
-    pinMode(_PIN_ANEMOMETER0, OUTPUT);
-    pinMode(_PIN_ANEMOMETER1, OUTPUT);
-    pinMode(_PIN_ANEMOMETER2, OUTPUT);
-    pinMode(_PIN_ANEMOMETER3, OUTPUT);
-    pinMode(9, OUTPUT);
-    digitalWrite(9, LOW); 
-    digitalWrite(_PIN_ANEMOMETER0, LOW); 
-    digitalWrite(_PIN_ANEMOMETER1, LOW); 
-    digitalWrite(_PIN_ANEMOMETER2, LOW); 
-    digitalWrite(_PIN_ANEMOMETER3, LOW); 
+        #ifndef TESTBENCH_DEBUG
+        pinMode(_PIN_ANEMOMETER0, OUTPUT);
+        pinMode(_PIN_ANEMOMETER1, OUTPUT);
+        pinMode(_PIN_ANEMOMETER2, OUTPUT);
+        pinMode(_PIN_ANEMOMETER3, OUTPUT);
+        pinMode(9, OUTPUT);
+        digitalWrite(9, LOW); 
+        digitalWrite(_PIN_ANEMOMETER0, LOW); 
+        digitalWrite(_PIN_ANEMOMETER1, LOW); 
+        digitalWrite(_PIN_ANEMOMETER2, LOW); 
+        digitalWrite(_PIN_ANEMOMETER3, LOW); 
+        #else
+        #endif
     #endif
 
     
