@@ -48,7 +48,7 @@
 #define THRESH_GOOD_BATT_V 3750 // in milli volts
 
 // configuration macros
-#define ADC_SAMPLE_NUM 200 // number of samples taken for averaging 
+#define ADC_SAMPLE_NUM 30 
 
 //#define PACKET_U
 #define PACKET_BINARY
