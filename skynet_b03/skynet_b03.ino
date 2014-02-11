@@ -41,6 +41,9 @@
 #define FALSE 0
 #define TRUE 1
 
+#define __ON 1 
+#define __OFF 0
+
 OneWire oneWire1(_PIN_AMB_TEMP);
 DallasTemperature dallas_amb_sen(&oneWire1);
 
@@ -91,6 +94,10 @@ schema_3 packet;
 long sample_counter = 0; 
 long transmit_timer = 0; 
 
+struct power_state{
+    int xbee = __ON;
+    int sensor_array = __ON;
+}
 /***************************************************
  *      setup()
  *
@@ -102,20 +109,20 @@ void setup() {
     // Set the communication speeds
     Serial.begin(9600);
 
-    #ifdef DEBUG
+#ifdef DEBUG
     Serial.println("Begin program!");
-    #endif
+#endif
     
     // Initalize the Xbee depending on which mode we're set to.
     // The TESTBENCH_DEBUG mode assumes we're using software
     // serial for the xbee
 
-    #ifdef TESTBENCH_DEBUG 
+#ifdef TESTBENCH_DEBUG 
     softserial.begin(9600);
     xbee.begin(softserial);
-    #else
+#else
     xbee.begin(Serial);
-    #endif
+#endif
 
     bmp085.begin();
     ina219_Solar.begin();
@@ -129,16 +136,23 @@ void setup() {
     // Initialize the packet!
     clear_packet();
 
-    #ifdef DEBUG
+    pstate_xbee(__ON);
+    pstate_sensor_array(__ON);
+
+#ifdef DEBUG
     Serial.println("Wait for configuration set..");
-    #endif
+#endif
 
     // Wait to make sure configuration finishes
-    delay(1000);
+    delay(500);
+
+#ifdef DEBUG
     Serial.println("Finished with setup!");
+#endif
 
     // Disabled by Kenny on 02/07/14
     // configureWDT();
+    
 }
 
 /***************************************************
@@ -296,8 +310,6 @@ long sampleBatteryVoltage(void){
     return ((temp*5000.0/1023));
 }
 
-
-
 /***************************************************
  *  Name:        sampleBatteryVoltageRaw
  *  Returns:     an averaged battery voltage.
@@ -315,8 +327,25 @@ double sampleBatteryVoltageRaw(void){
     return temp;
 }
 
+/********************************
+ * 
+ *  Power State Functions 
+ *
+ ******************************/
+// Switches the sleep states for the xbee
+void pstate_xbee(int state){
+    power_state.xbee = state; 
+    sync_pstate();
+}
 
+// Switches the power state for the sensor array using the power switch
+void pstate_sensor_array(int state){
+    power_state.xbee = state; 
+    sync_pstate();
+}
 
-
-
-
+// Sync the power states (called at the end of every pstate function)
+void sync_pstate(void){
+    digitalWrite(_PIN_XBEE_SLEEP, !power_state.xbee);
+    digitalWrite(_PIN_PSWITCH, power_state.sensor_array);
+}
