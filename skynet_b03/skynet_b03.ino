@@ -44,6 +44,9 @@
 #define __ON 1 
 #define __OFF 0
 
+#define __ACTIVE 1
+#define __POWER_SAVE 0
+
 OneWire oneWire1(_PIN_AMB_TEMP);
 DallasTemperature dallas_amb_sen(&oneWire1);
 
@@ -94,10 +97,13 @@ schema_3 packet;
 long sample_counter = 0; 
 long transmit_timer = 0; 
 
-struct power_state{
+struct P_STATE{
     int xbee = __ON;
     int sensor_array = __ON;
-}
+};
+
+P_STATE power_state;
+
 /***************************************************
  *      setup()
  *
@@ -136,8 +142,8 @@ void setup() {
     // Initialize the packet!
     clear_packet();
 
-    pstate_xbee(__ON);
-    pstate_sensor_array(__ON);
+    // turn the power on!
+    pstate_system(__ACTIVE);
 
 #ifdef DEBUG
     Serial.println("Wait for configuration set..");
@@ -329,9 +335,20 @@ double sampleBatteryVoltageRaw(void){
 
 /********************************
  * 
- *  Power State Functions 
+ *  Power Managment Functions 
  *
  ******************************/
+void pstate_system(int state){
+    if(state == __ACTIVE){
+        pstate_xbee(__ON);
+        pstate_xbee(__ON);
+    }
+    else if(state == __POWER_SAVE){
+        pstate_xbee(__OFF);
+        pstate_xbee(__OFF);
+    }
+
+}
 // Switches the sleep states for the xbee
 void pstate_xbee(int state){
     power_state.xbee = state; 
