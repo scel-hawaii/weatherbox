@@ -122,8 +122,7 @@ void setup() {
 
 
     // Wait for everything to settle down
-    sleep(100);
-
+    delay(100);
 
     // Initialize our battery sample by averaging 200 samples
     // and then sending that to our low pass filter 
@@ -132,7 +131,7 @@ void setup() {
         battery_sample += analogRead(_PIN_BATT_V);
     }
     battery_sample = battery_sample / 200;
-    LPF_filter_init(&batter_filter, battery_sample);
+    LPF_filter_init(&batter_filter, (float)battery_sample, 0.001);
 
 #ifdef DEBUG
     Serial.println("Begin program!");
