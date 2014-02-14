@@ -190,11 +190,16 @@ void setup() {
  ***************************************************/
 void loop() {
     while(1){
+    
+        // Sean: Update current battery voltage
+        LPF_update_filter(&batter_filter, analogRead(_PIN_BATT_V));
 
         // If the battery is good, keep running our routine 
         // TODO: When the power scheme is re-initialized remove the 1 
         // from the if statement and include our check
-        if(1){
+	// Sean: Checking if the battery voltage in mV is good
+        if((batter_filter.output*5000/1023) >= THRESH_GOOD_BATT_V)
+	{
             // Run the barebones routine forever
             transmit_timer = millis();
             barebones_routine();
@@ -205,19 +210,31 @@ void loop() {
         // Otherwise, do this
         else{
             // Shut down the power, and wait for it to be good
+	    // Sean: Shutting down xbee and sensors
+	    pstate_system(__POWER_SAVE);
 
+            // Sean: updating battery voltage
+            LPF_update_filter(&batter_filter, analogRead(_PIN_BATT_V));
 
             // Keep checking to see if the battery is okay, 
             // and is above the certain threshold. Keep in mind that we do need 
             // a certain amount of distance between the cutoff voltage and the 
             // re-initialization voltage. 
-            while(1){
+	    // Sean: checking voltage
+            while((batter_filter.output*5000/1023) < 3850){
                 // Delay every couple of millis
-
+                // Sean: Update timer to current time
+	        transmit_timer = millis();
+		int delay = 200;
+		while((millis() - transmit_timer) <= delay);
+                LPF_update_filter(&batter_filter, analogRead(_PIN_BATT_V));
             }
             
             // If we break out of this loop, lets re-initalize all of our systems
             // to make sure that we're good. 
+	    // Sean: re-initializing
+	    pstate_system(__ACTIVE);
+	    LPF_filter_init(&batter_filter, batter_filter.output, 0.001);
         }
 
     }
@@ -230,7 +247,7 @@ void barebones_routine(){
 
     #ifdef DEBUG
     Serial.print("Sample count: ");
-    Serial.println(sample_counter);
+    Serial.println(sample_counter); 
     #endif
 
 	if(sample_counter >= 60) {
