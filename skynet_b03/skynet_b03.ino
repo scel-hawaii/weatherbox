@@ -292,7 +292,7 @@ void barebones_routine(){
     // If it hasn't passed the wait time yet we wait, 
     // and once it has passed, we reset that timer again.
     // This way, we sample exactly every second
-    int wait_millis = 25;
+    int wait_millis = 1000;
     while( (millis() -  transmit_timer) <= wait_millis );
 }
 

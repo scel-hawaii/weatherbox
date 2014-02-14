@@ -10,8 +10,8 @@
 #define APPLE_VERSION 23
 
 // Define different operation modes here
-#define TESTBENCH_DEBUG
-#define DEBUG
+// #define TESTBENCH_DEBUG
+// #define DEBUG
 // #define NORMAL_OPERATION
 
 // pins!
