@@ -12,6 +12,7 @@
 // Define different operation modes here
 // #define TESTBENCH_DEBUG
 // #define DEBUG
+// #define DEBUG_SOFT
 // #define NORMAL_OPERATION
 
 // pins!

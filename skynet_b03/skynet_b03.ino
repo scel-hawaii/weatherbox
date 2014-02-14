@@ -62,6 +62,7 @@ Adafruit_INA219 ina219_Solar;
 #ifdef TESTBENCH_DEBUG
 SoftwareSerial softserial(12, 11); //RX, TX
 #else
+SoftwareSerial softserial(12, 11); //RX, TX
 #endif
 
 XBee xbee = XBee();
@@ -124,6 +125,10 @@ void setup() {
         Serial.println("Begin Setup!");
     #endif
 
+    #ifdef DEBUG_SOFT
+        softserial.print("Begin Setup!");
+    #endif
+
     // Wait for everything to settle down
     delay(100);
 
@@ -139,13 +144,16 @@ void setup() {
 #ifdef DEBUG
     Serial.println("Begin program!");
 #endif
+#ifdef DEBUG_SOFT
+    Serial.println("Begin program!");
+#endif
     
     // Initalize the Xbee depending on which mode we're set to.
     // The TESTBENCH_DEBUG mode assumes we're using software
     // serial for the xbee
 
+softserial.begin(9600);
 #ifdef TESTBENCH_DEBUG 
-    softserial.begin(9600);
     xbee.begin(softserial);
 #else
     xbee.begin(Serial);
@@ -170,10 +178,17 @@ void setup() {
     Serial.println("Wait for configuration set..");
 #endif
 
+#ifdef DEBUG_SOFT
+    softserial.println("Wait for configuration set..");
+#endif
+
     // Wait to make sure configuration finishes
     delay(500);
 
 #ifdef DEBUG
+    Serial.println("Finished with setup!");
+#endif
+#ifdef DEBUG_SOFT
     Serial.println("Finished with setup!");
 #endif
 
@@ -198,11 +213,19 @@ void loop() {
         #ifdef TESTBENCH_DEBUG
         Serial.println("Begin Loop");
         #endif
+
+        #ifdef DEBUG_SOFT
+        softserial.println("Begin Loop");
+        #endif
         // Sean: Update current battery voltage
         LPF_update_filter(&battery_filter, analogRead(_PIN_BATT_V));
 
         #ifdef TESTBENCH_DEBUG
         Serial.println("Finished updating filter.");
+        #endif
+
+        #ifdef DEBUG_SOFT
+        softserial.println("Finished updating filter.");
         #endif
 
         // If the battery is good, keep running our routine 
@@ -216,11 +239,19 @@ void loop() {
         Serial.println("Our battery voltage is at: ");
         Serial.println(batt_voltage);
         #endif
+        #ifdef DEBUG_SOFT
+        softserial.println("Our battery voltage is at: ");
+        softserial.println(batt_voltage);
+        #endif
 
         if( batt_voltage >= THRESH_GOOD_BATT_V)
         {
             #ifdef TESTBENCH_DEBUG
             Serial.println("Voltage is good!");
+            #endif
+
+            #ifdef DEBUG_SOFT
+            softserial.println("Voltage is good!");
             #endif
             // Run the barebones routine forever
             transmit_timer = millis();
@@ -232,6 +263,10 @@ void loop() {
         else{
             #ifdef TESTBENCH_DEBUG
             Serial.println("Voltage is not good!");
+            #endif
+
+            #ifdef DEBUG_SOFT
+            softserial.println("Voltage is not good!");
             #endif
             // Shut down the power, and wait for it to be good
 	        // Sean: Shutting down xbee and sensors
@@ -252,6 +287,11 @@ void loop() {
                 #ifdef TESTBENCH_DEBUG
                 Serial.print("Check if voltage is good anymore:");
                 Serial.println(LPF_get_current_output(&battery_filter));
+                #endif
+
+                #ifdef DEBUG_SOFT
+                softserial.print("Check if voltage is good anymore:");
+                softserial.println(LPF_get_current_output(&battery_filter));
                 #endif
                 transmit_timer = millis();
                 int delay = 200;
@@ -279,9 +319,18 @@ void barebones_routine(){
     Serial.println(sample_counter); 
     #endif
 
+    #ifdef DEBUG_SOFT
+    softserial.print("Sample count: ");
+    softserial.println(sample_counter); 
+    #endif
+
 	if(sample_counter >= 60) {
         #ifdef DEBUG
         Serial.println("Transmitting!");
+        #endif
+
+        #ifdef DEBUG_SOFT
+        softserial.println("Transmitting!");
         #endif
 
         transmitPacketBinary(); 
@@ -292,7 +341,7 @@ void barebones_routine(){
     // If it hasn't passed the wait time yet we wait, 
     // and once it has passed, we reset that timer again.
     // This way, we sample exactly every second
-    int wait_millis = 1000;
+    long wait_millis = 1000;
     while( (millis() -  transmit_timer) <= wait_millis );
 }
 
