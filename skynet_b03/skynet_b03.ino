@@ -99,8 +99,8 @@ long sample_counter = 0;
 long transmit_timer = 0; 
 
 struct P_STATE{
-    int xbee = __ON;
-    int sensor_array = __ON;
+    int xbee;
+    int sensor_array;
 };
 
 P_STATE power_state;
@@ -192,6 +192,8 @@ void loop() {
     while(1){
 
         // If the battery is good, keep running our routine 
+        // TODO: When the power scheme is re-initialized remove the 1 
+        // from the if statement and include our check
         if(1){
             // Run the barebones routine forever
             transmit_timer = millis();
@@ -384,11 +386,11 @@ double sampleBatteryVoltageRaw(void){
 void pstate_system(int state){
     if(state == __ACTIVE){
         pstate_xbee(__ON);
-        pstate_xbee(__ON);
+        pstate_sensor_array(__ON);
     }
     else if(state == __POWER_SAVE){
         pstate_xbee(__OFF);
-        pstate_xbee(__OFF);
+        pstate_sensor_array(__OFF);
     }
 
 }
@@ -400,7 +402,7 @@ void pstate_xbee(int state){
 
 // Switches the power state for the sensor array using the power switch
 void pstate_sensor_array(int state){
-    power_state.xbee = state; 
+    power_state.sensor_array = state; 
     sync_pstate();
 }
 
