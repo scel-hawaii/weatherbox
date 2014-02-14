@@ -10,7 +10,7 @@
 #define APPLE_VERSION 23
 
 // Define different operation modes here
-// #define TESTBENCH_DEBUG
+#define TESTBENCH_DEBUG
 #define DEBUG
 // #define NORMAL_OPERATION
 
@@ -45,10 +45,25 @@
 #define _PIN_SDA A4
 #define _PIN_SCL A5
 
-#define THRESH_GOOD_BATT_V 3750 // in milli volts
+// Sets the good voltage threshold 
+// Below this the box goes into a power saving mode 
+// and waits for the voltage to come back above the 
+// THRESH_REINIT_SYSTEM
+// Calculation: 3.730/5 * 1023 = 763.158 ~ 763
+#define THRESH_GOOD_BATT_V 763
+
+// THRESH_REINIT_SYSTEM defines the voltage where the system 
+// reinitializes transmission and sensing. 
+// Check for the 3.830 volts:
+// Calculation: (3.83/5) * 1023 == 783.618 ~ 783
+#define THRESH_REINIT_SYSTEM 783
 
 // configuration macros
 #define ADC_SAMPLE_NUM 30 
+
+// This defines the alpha value for the battery lowpass filter
+#define BATT_LOWPASS_ALPHA 0.005
+
 
 //#define PACKET_U
 #define PACKET_BINARY

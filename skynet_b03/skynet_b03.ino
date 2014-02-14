@@ -60,7 +60,7 @@ Adafruit_BMP085 bmp085;
 Adafruit_INA219 ina219_Solar;
 
 #ifdef TESTBENCH_DEBUG
-SoftwareSerial softserial(12, 11);
+SoftwareSerial softserial(12, 11); //RX, TX
 #else
 #endif
 
@@ -105,7 +105,7 @@ struct P_STATE{
 
 P_STATE power_state;
 
-LowPassFilter batter_filter;
+LowPassFilter battery_filter;
 long battery_sample = 0; 
 
 /***************************************************
@@ -120,6 +120,9 @@ void setup() {
     // Set the communication speeds
     Serial.begin(9600);
 
+    #ifdef DEBUG
+        Serial.println("Begin Setup!");
+    #endif
 
     // Wait for everything to settle down
     delay(100);
@@ -131,7 +134,7 @@ void setup() {
         battery_sample += analogRead(_PIN_BATT_V);
     }
     battery_sample = battery_sample / 200;
-    LPF_filter_init(&batter_filter, (float)battery_sample, 0.001);
+    LPF_filter_init(&battery_filter, (float)battery_sample, BATT_LOWPASS_ALPHA);
 
 #ifdef DEBUG
     Serial.println("Begin program!");
@@ -189,52 +192,78 @@ void setup() {
  *      C and C++ programs
  ***************************************************/
 void loop() {
+    int batt_voltage = 0; 
     while(1){
     
+        #ifdef TESTBENCH_DEBUG
+        Serial.println("Begin Loop");
+        #endif
         // Sean: Update current battery voltage
-        LPF_update_filter(&batter_filter, analogRead(_PIN_BATT_V));
+        LPF_update_filter(&battery_filter, analogRead(_PIN_BATT_V));
+
+        #ifdef TESTBENCH_DEBUG
+        Serial.println("Finished updating filter.");
+        #endif
 
         // If the battery is good, keep running our routine 
         // TODO: When the power scheme is re-initialized remove the 1 
         // from the if statement and include our check
-	// Sean: Checking if the battery voltage in mV is good
-        if((batter_filter.output*5000/1023) >= THRESH_GOOD_BATT_V)
-	{
+        // Sean: Checking if the battery voltage in mV is good
+
+        batt_voltage = LPF_get_current_output(&battery_filter);
+
+        #ifdef TESTBENCH_DEBUG
+        Serial.println("Our battery voltage is at: ");
+        Serial.println(batt_voltage);
+        #endif
+
+        if( batt_voltage >= THRESH_GOOD_BATT_V)
+        {
+            #ifdef TESTBENCH_DEBUG
+            Serial.println("Voltage is good!");
+            #endif
             // Run the barebones routine forever
             transmit_timer = millis();
             barebones_routine();
         }
 
 
-
         // Otherwise, do this
         else{
+            #ifdef TESTBENCH_DEBUG
+            Serial.println("Voltage is not good!");
+            #endif
             // Shut down the power, and wait for it to be good
-	    // Sean: Shutting down xbee and sensors
-	    pstate_system(__POWER_SAVE);
+	        // Sean: Shutting down xbee and sensors
+	        pstate_system(__POWER_SAVE);
 
             // Sean: updating battery voltage
-            LPF_update_filter(&batter_filter, analogRead(_PIN_BATT_V));
+            LPF_update_filter(&battery_filter, analogRead(_PIN_BATT_V));
 
             // Keep checking to see if the battery is okay, 
             // and is above the certain threshold. Keep in mind that we do need 
             // a certain amount of distance between the cutoff voltage and the 
             // re-initialization voltage. 
-	    // Sean: checking voltage
-            while((batter_filter.output*5000/1023) < 3850){
+	        // Sean: checking voltage
+
+            while(LPF_get_current_output(&battery_filter) < THRESH_REINIT_SYSTEM){
                 // Delay every couple of millis
                 // Sean: Update timer to current time
-	        transmit_timer = millis();
-		int delay = 200;
-		while((millis() - transmit_timer) <= delay);
-                LPF_update_filter(&batter_filter, analogRead(_PIN_BATT_V));
+                #ifdef TESTBENCH_DEBUG
+                Serial.print("Check if voltage is good anymore:");
+                Serial.println(LPF_get_current_output(&battery_filter));
+                #endif
+                transmit_timer = millis();
+                int delay = 200;
+                while((millis() - transmit_timer) <= delay);
+                LPF_update_filter(&battery_filter, analogRead(_PIN_BATT_V));
             }
             
             // If we break out of this loop, lets re-initalize all of our systems
             // to make sure that we're good. 
-	    // Sean: re-initializing
-	    pstate_system(__ACTIVE);
-	    LPF_filter_init(&batter_filter, batter_filter.output, 0.001);
+            // Sean: re-initializing
+	        pstate_system(__ACTIVE);
+	        LPF_filter_init(&battery_filter, battery_filter.output, 0.001);
         }
 
     }
@@ -263,7 +292,7 @@ void barebones_routine(){
     // If it hasn't passed the wait time yet we wait, 
     // and once it has passed, we reset that timer again.
     // This way, we sample exactly every second
-    int wait_millis = 1000;
+    int wait_millis = 25;
     while( (millis() -  transmit_timer) <= wait_millis );
 }
 
