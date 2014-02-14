@@ -17,6 +17,7 @@
  ***************************************************/
 void samplePacketUART(void)
 {
+#ifdef PacketUART
         s = "{";
         s += "\"address\": ";
         s += String(address);
@@ -62,7 +63,7 @@ void samplePacketUART(void)
         // s += "blah blah blah";
 
         // s += "Hath not a Jew eyes? Hath not a Jew hands, organs, dimensions, senses, affections, passions, fed with the same food, hurt with the same weapons, subject to the same diseases, healed by the same means, warmed and cooled by the same winter and summer, as a Christian is? If you prick us, do we not bleed? If you tickle us, do we not laugh? If you poison us, do we not die? And if you wrong us, shall we not revenge?"; // s misbehaves when long
-
+#endif
 }
 
 /***************************************************
@@ -77,6 +78,7 @@ void samplePacketUART(void)
  ***************************************************/
 void transmitPacketUART()
 {
+#ifdef PacketUART
     for (int i = 0; i < sizeof(payload); i++)
         payload[i] = i % 10 + '0';
     // payload[i] = '\0';
@@ -89,4 +91,5 @@ void transmitPacketUART()
     ZBTxRequest zbTx = ZBTxRequest(addr64, payload, len);
     xbee.send(zbTx);
     softserial.println(s);
+#endif
 }

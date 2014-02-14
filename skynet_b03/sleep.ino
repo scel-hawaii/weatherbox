@@ -43,13 +43,13 @@ void configureWDT(void){
  ***************************************************/
 ISR(WDT_vect)
 {
-    if(f_wdt == 0)
-    {
+    if(f_wdt == 0) {
         f_wdt=1;
     }
-    else
-    {
+    else {
+        #ifdef TESTBENCH_DEBUG
         softserial.println("WDT Overrun!!!");
+        #endif
     }
 }
 
