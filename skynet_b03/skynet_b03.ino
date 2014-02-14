@@ -105,6 +105,9 @@ struct P_STATE{
 
 P_STATE power_state;
 
+LowPassFilter batter_filter;
+long battery_sample = 0; 
+
 /***************************************************
  *      setup()
  *
@@ -112,9 +115,24 @@ P_STATE power_state;
  *      sequence, before the setup function. Put any init scripts 
  *      you may need in here. 
  ***************************************************/
+
 void setup() {
     // Set the communication speeds
     Serial.begin(9600);
+
+
+    // Wait for everything to settle down
+    sleep(100);
+
+
+    // Initialize our battery sample by averaging 200 samples
+    // and then sending that to our low pass filter 
+    // by making that it initial sample.
+    for(i = 0; i < 200 ; i ++) {
+        battery_sample += analogRead(_PIN_BATT_V);
+    }
+    battery_sample = battery_sample / 200;
+    LPF_filter_init(&batter_filter, battery_sample);
 
 #ifdef DEBUG
     Serial.println("Begin program!");
@@ -173,9 +191,34 @@ void setup() {
  ***************************************************/
 void loop() {
     while(1){
-        // Run the barebones routine forever
-        transmit_timer = millis();
-        barebones_routine();
+
+        // If the battery is good, keep running our routine 
+        if(1){
+            // Run the barebones routine forever
+            transmit_timer = millis();
+            barebones_routine();
+        }
+
+
+
+        // Otherwise, do this
+        else{
+            // Shut down the power, and wait for it to be good
+
+
+            // Keep checking to see if the battery is okay, 
+            // and is above the certain threshold. Keep in mind that we do need 
+            // a certain amount of distance between the cutoff voltage and the 
+            // re-initialization voltage. 
+            while(1){
+                // Delay every couple of millis
+
+            }
+            
+            // If we break out of this loop, lets re-initalize all of our systems
+            // to make sure that we're good. 
+        }
+
     }
 }
 
