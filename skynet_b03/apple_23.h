@@ -49,13 +49,13 @@
 // Sets the good voltage threshold 
 // Below this the box goes into a power saving mode 
 // and waits for the voltage to come back above the 
-// THRESH_REINIT_SYSTEM
+// THRESH_REINIT_SYSTEM, 3.730 volts or approx 45% capacity remaining
 // Calculation: 3.730/5 * 1023 = 763.158 ~ 763
 #define THRESH_GOOD_BATT_V 763
 
 // THRESH_REINIT_SYSTEM defines the voltage where the system 
 // reinitializes transmission and sensing. 
-// Check for the 3.830 volts:
+// Check for the 3.830 volts (approximately 68% capacity remaining)
 // Calculation: (3.83/5) * 1023 == 783.618 ~ 783
 #define THRESH_REINIT_SYSTEM 783
 
