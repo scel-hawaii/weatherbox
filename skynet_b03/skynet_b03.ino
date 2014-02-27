@@ -303,9 +303,13 @@ void loop() {
             // to make sure that we're good. 
             // Sean: re-initializing
 	        pstate_system(__ACTIVE);
+
+            // Delay 3 seconds to allow xbee to wake up. Minimum start up time
+	    // should be 1 second at most but 3 seconds to be safe
 		transmit_timer = millis();
 		delay = 3000;
 		while((millis() - transmit_timer) <= delay);
+
 	        LPF_filter_init(&battery_filter, battery_filter.output, 0.001);
         }
 
