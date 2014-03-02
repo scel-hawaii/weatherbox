@@ -10,6 +10,7 @@ XBee xbee = XBee();
 
 // response object to handle incomming messages 
 ZBRxResponse ZBrx = ZBRxResponse();
+long time = 0;
   
 void setup() {
   Serial.begin(9600);
@@ -35,7 +36,10 @@ void loop()
       // Displays size of packet received
       Serial.print("\nSize of Packet: ");
       Serial.println(ZBrx.getDataLength());
+      Serial.print("\nTime since last transmission: ");
+      Serial.println((millis() - time)/1000);
       Serial.println();
+      time = millis();
     }
   }
 }
