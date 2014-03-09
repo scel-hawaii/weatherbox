@@ -19,8 +19,6 @@ void setup()
 {
   Serial.begin(9600);
   xbee.begin(Serial);
-    
-  pinMode(RQ_XBEE_SLEEP, OUTPUT);
 }
 
 void loop()
@@ -57,12 +55,14 @@ void loop()
 
   if(sleep)  
   {
+      pinMode(RQ_XBEE_SLEEP, OUTPUT);
       // When sleep pin given low voltage, xbee wakes up
       digitalWrite(RQ_XBEE_SLEEP, LOW);
       sleep = false;
   }
   else
   {
+      pinMode(RQ_XBEE_SLEEP, INPUT);
       // When sleep pin given high voltage, xbee sleeps
       digitalWrite(RQ_XBEE_SLEEP, HIGH);
       sleep = true;

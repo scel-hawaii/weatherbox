@@ -55,7 +55,8 @@ void loop()
   memcpy(payload, &packet, sizeof(packet));
 
   if((millis() - time) >= 5000)  
-  {
+  {    
+      pinMode(RQ_XBEE_SLEEP, OUTPUT);
       digitalWrite(RQ_XBEE_SLEEP, LOW);
       time = millis();
       while((millis() - time) < 3000);
@@ -66,5 +67,8 @@ void loop()
       xbee.send(zbTx);
   }
   else
+  {
+      pinMode(RQ_XBEE_SLEEP, INPUT);
       digitalWrite(RQ_XBEE_SLEEP, HIGH);
+  }
 }

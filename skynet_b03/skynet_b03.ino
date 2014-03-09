@@ -94,6 +94,7 @@ uint8_t rf_payload[243];
 
 //schema_1 packet;
 schema_3 packet;
+schema_health health;
 
 // count number of samples taken
 long sample_counter = 0; 
@@ -207,7 +208,7 @@ softserial.begin(9600);
  *      C and C++ programs
  ***************************************************/
 void loop() {
-    int batt_voltage = 0; 
+    int batt_voltage = 0, panel_voltage = 0, apogee_voltage = 0; 
     while(1){
     
         #ifdef TESTBENCH_DEBUG
@@ -217,6 +218,7 @@ void loop() {
         #ifdef DEBUG_SOFT
         softserial.println("Begin Loop");
         #endif
+
         // Sean: Update current battery voltage
         LPF_update_filter(&battery_filter, analogRead(_PIN_BATT_V));
 
@@ -234,6 +236,8 @@ void loop() {
         // Sean: Checking if the battery voltage in mV is good
 
         batt_voltage = LPF_get_current_output(&battery_filter);
+	panel_voltage = 2*analogRead(_PIN_SOLAR_V);
+	apogee_voltage = analogRead(_PIN_APOGEE_V);
 
         #ifdef TESTBENCH_DEBUG
         Serial.println("Our battery voltage is at: ");
@@ -258,7 +262,6 @@ void loop() {
             barebones_routine();
         }
 
-
         // Otherwise, do this
         else{
             #ifdef TESTBENCH_DEBUG
@@ -275,13 +278,41 @@ void loop() {
             // Sean: updating battery voltage
             LPF_update_filter(&battery_filter, analogRead(_PIN_BATT_V));
 
+            // Time how long it has been since last health data transmission
+            long health_transmit_timer = millis();
+
             // Keep checking to see if the battery is okay, 
             // and is above the certain threshold. Keep in mind that we do need 
             // a certain amount of distance between the cutoff voltage and the 
             // re-initialization voltage. 
 	        // Sean: checking voltage
-
             while(LPF_get_current_output(&battery_filter) < THRESH_REINIT_SYSTEM){
+                if(LPF_get_current_output(&battery_filter) >= THRESH_LOW_BATT_V)
+                {
+                    long transmit_health = 600000;
+		    if((millis() - health_transmit_timer) >= transmit_health)
+                    {
+                        #ifdef HEALTH_GOOD_APOGEE
+                        if(apogee_voltage >= THRESH_GOOD_APOGEE_V)
+                        #elseif HEALTH_GOOD_PANEL
+                        if(panel_voltage >= THRESH_GOOD_PANEL_V)
+                        #endif
+                        {
+                            pstate_system(__ACTIVE);
+
+                            // Wait for the system to activate
+                            transmit_timer = millis();
+                            delay = 3000;
+                            while((millis() - tranmsit_timer) <= delay);
+
+                            // tranmsit health data
+                            health_data_transmit();
+
+			    health_transmit_timer = millis();
+                        }
+		    }
+                } 
+
                 // Delay every couple of millis
                 // Sean: Update timer to current time
                 #ifdef TESTBENCH_DEBUG
@@ -293,6 +324,7 @@ void loop() {
                 softserial.print("Check if voltage is good anymore:");
                 softserial.println(LPF_get_current_output(&battery_filter));
                 #endif
+
                 transmit_timer = millis();
                 int delay = 200;
                 while((millis() - transmit_timer) <= delay);
@@ -310,7 +342,7 @@ void loop() {
 		delay = 3000;
 		while((millis() - transmit_timer) <= delay);
 
-	        LPF_filter_init(&battery_filter, battery_filter.output, 0.001);
+		LPF_filter_init(&battery_filter, battery_filter.output, 0.001);
         }
 
     }
