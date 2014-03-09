@@ -20,14 +20,12 @@ it'll be nice and easy.
 Adafruit_MCP4725 dac2;
 
 void setup(){
-    Serial.println("INO: Starting setup routine");
     setup_routine();
-    Serial.println("INO: Finished setup routine");
 }
 
 void loop(){
-    Serial.println("INO: Starting main routine");
-    main_routine();
-    Serial.println("INO: WARNING: OUT OF MAIN ROUTINE!!");
+    // DAC_initDac();
+    // DAC_setVoltage(2.3);
+    while(1);
 }
 

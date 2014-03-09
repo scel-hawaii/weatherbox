@@ -1,3 +1,4 @@
+#include <Arduino.h>
 #include "uart.h"
 
 void setup_routine(void);

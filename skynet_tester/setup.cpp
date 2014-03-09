@@ -10,5 +10,4 @@ void setup_uart(){
 void setup_routine(){
     setup_ports();
     setup_uart();
-
 }

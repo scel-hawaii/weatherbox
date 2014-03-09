@@ -45,3 +45,4 @@ int CMD_fetch(TesterCommand * full_command){
 
     return 1;
 }
+
