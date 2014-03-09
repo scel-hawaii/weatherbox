@@ -100,8 +100,8 @@ schema_health health;
 long sample_counter = 0; 
 
 // global timers
-long transmit_timer = 0; 
-long health_transmit_timer = 0;
+unsigned long transmit_timer = 0; 
+unsigned long health_transmit_timer = 0;
 
 struct P_STATE{
     int xbee;
