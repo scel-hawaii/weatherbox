@@ -286,7 +286,8 @@ void loop() {
             // a certain amount of distance between the cutoff voltage and the 
             // re-initialization voltage. 
 	        // Sean: checking voltage
-            while(LPF_get_current_output(&battery_filter) < THRESH_REINIT_SYSTEM){
+            while(LPF_get_current_output(&battery_filter) < THRESH_REINIT_SYSTEM)
+            {
                 if(LPF_get_current_output(&battery_filter) >= THRESH_LOW_BATT_V)
                 {
                     long transmit_health = 600000;
