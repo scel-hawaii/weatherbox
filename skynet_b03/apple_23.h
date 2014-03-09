@@ -46,12 +46,35 @@
 #define _PIN_SDA A4
 #define _PIN_SCL A5
 
+// Determines whether we use the solar irradiance or
+// the panel voltage to check if we can send health
+// data while the battery voltage is low
+// If using solar irradiance keep defined
+// If using the panel voltage, comment out
+#define HEALTH_GOOD_APOGEE
+
 // Sets the good voltage threshold 
 // Below this the box goes into a power saving mode 
 // and waits for the voltage to come back above the 
 // THRESH_REINIT_SYSTEM, 3.730 volts or approx 45% capacity remaining
 // Calculation: 3.730/5 * 1023 = 763.158 ~ 763
 #define THRESH_GOOD_BATT_V 763
+
+// When the battery voltage is low but above ~30%
+// and the solar power is good, the box transmits
+// health data every 10 minutes
+// Calculation: 3.703/5 * 1023 = 757.6338 ~ 757 
+#define THRESH_LOW_BATT_V 757
+
+// The solar is considered good if the solar panel
+// voltage is around 6 volts
+// Calculation: 6/2/5 * 1023 = 613.8 ~ 614
+#define THRESH_GOOD_PANEL_V 614
+
+// Solar is considered good if the solar irradiance
+// voltage is around 2.5 volts
+// Calculation: 2.5/5 * 1023 = 511.5 ~ 511
+#define THRESH_GOOD_APOGEE_V 511
 
 // THRESH_REINIT_SYSTEM defines the voltage where the system 
 // reinitializes transmission and sensing. 

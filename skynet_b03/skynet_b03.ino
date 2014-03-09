@@ -94,10 +94,14 @@ uint8_t rf_payload[243];
 
 //schema_1 packet;
 schema_3 packet;
+schema_health health;
 
 // count number of samples taken
 long sample_counter = 0; 
+
+// global timers
 long transmit_timer = 0; 
+long health_transmit_timer = 0;
 
 struct P_STATE{
     int xbee;
@@ -217,6 +221,7 @@ void loop() {
         #ifdef DEBUG_SOFT
         softserial.println("Begin Loop");
         #endif
+
         // Sean: Update current battery voltage
         LPF_update_filter(&battery_filter, analogRead(_PIN_BATT_V));
 
@@ -258,7 +263,6 @@ void loop() {
             barebones_routine();
         }
 
-
         // Otherwise, do this
         else{
             #ifdef TESTBENCH_DEBUG
@@ -275,13 +279,20 @@ void loop() {
             // Sean: updating battery voltage
             LPF_update_filter(&battery_filter, analogRead(_PIN_BATT_V));
 
+            // Initialize time since last health data transmission
+            health_transmit_timer = millis();
+
             // Keep checking to see if the battery is okay, 
             // and is above the certain threshold. Keep in mind that we do need 
             // a certain amount of distance between the cutoff voltage and the 
             // re-initialization voltage. 
 	        // Sean: checking voltage
-
-            while(LPF_get_current_output(&battery_filter) < THRESH_REINIT_SYSTEM){
+            while(LPF_get_current_output(&battery_filter) < THRESH_REINIT_SYSTEM)
+            {
+                // Check if we can send the health data
+                // Battery and panel/solar irrandance voltages must be good
+                chkHealth();
+                
                 // Delay every couple of millis
                 // Sean: Update timer to current time
                 #ifdef TESTBENCH_DEBUG
@@ -293,6 +304,7 @@ void loop() {
                 softserial.print("Check if voltage is good anymore:");
                 softserial.println(LPF_get_current_output(&battery_filter));
                 #endif
+
                 transmit_timer = millis();
                 int delay = 200;
                 while((millis() - transmit_timer) <= delay);
@@ -307,10 +319,10 @@ void loop() {
             // Delay 3 seconds to allow xbee to wake up. Minimum start up time
 	    // should be 1 second at most but 3 seconds to be safe
 		transmit_timer = millis();
-		delay = 3000;
-		while((millis() - transmit_timer) <= delay);
+		int wake_time = 3000;
+		while((millis() - transmit_timer) <= wake_time);
 
-	        LPF_filter_init(&battery_filter, battery_filter.output, 0.001);
+		LPF_filter_init(&battery_filter, battery_filter.output, 0.001);
         }
 
     }
