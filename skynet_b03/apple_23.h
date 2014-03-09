@@ -53,6 +53,11 @@
 // If using the panel voltage, comment out
 #define HEALTH_GOOD_APOGEE
 
+// State of Health Macros
+#define NORMAL 0
+#define GOOD_SOLAR 1
+#define POOR 2
+
 // Sets the good voltage threshold 
 // Below this the box goes into a power saving mode 
 // and waits for the voltage to come back above the 

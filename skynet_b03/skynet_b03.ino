@@ -249,7 +249,7 @@ void loop() {
         softserial.println(batt_voltage);
         #endif
 
-        if( batt_voltage >= THRESH_GOOD_BATT_V)
+        if(chkHealth() == NORMAL || chkHealth() == GOOD_SOLAR)
         {
             #ifdef TESTBENCH_DEBUG
             Serial.println("Voltage is good!");
@@ -289,9 +289,8 @@ void loop() {
 	        // Sean: checking voltage
             while(LPF_get_current_output(&battery_filter) < THRESH_REINIT_SYSTEM)
             {
-                // Check if we can send the health data
-                // Battery and panel/solar irrandance voltages must be good
-                chkHealth();
+                // Send the health data every 10 minutes
+                sendHealth();
                 
                 // Delay every couple of millis
                 // Sean: Update timer to current time
