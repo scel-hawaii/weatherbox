@@ -4,7 +4,6 @@ void getPacketHealth(void)
     health.schema = 4;
     health.address = address;
     health.uptime_ms = millis();
-    health.n = packet.n;
     health.batt_mv = analogRead(_PIN_BATT_V)*5/1023;
 }
 

@@ -85,6 +85,5 @@ typedef struct {
     uint16_t schema;
     uint16_t address;
     uint32_t uptime_ms;
-    uint8_t n;
     uint16_t batt_mv;
 } schema_health;
