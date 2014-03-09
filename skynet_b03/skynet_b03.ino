@@ -98,7 +98,10 @@ schema_health health;
 
 // count number of samples taken
 long sample_counter = 0; 
+
+// global timers
 long transmit_timer = 0; 
+long health_transmit_timer = 0;
 
 struct P_STATE{
     int xbee;
@@ -208,7 +211,7 @@ softserial.begin(9600);
  *      C and C++ programs
  ***************************************************/
 void loop() {
-    int batt_voltage = 0, panel_voltage = 0, apogee_voltage = 0; 
+    int batt_voltage = 0; 
     while(1){
     
         #ifdef TESTBENCH_DEBUG
@@ -236,8 +239,6 @@ void loop() {
         // Sean: Checking if the battery voltage in mV is good
 
         batt_voltage = LPF_get_current_output(&battery_filter);
-	panel_voltage = 2*analogRead(_PIN_SOLAR_V);
-	apogee_voltage = analogRead(_PIN_APOGEE_V);
 
         #ifdef TESTBENCH_DEBUG
         Serial.println("Our battery voltage is at: ");
@@ -278,8 +279,8 @@ void loop() {
             // Sean: updating battery voltage
             LPF_update_filter(&battery_filter, analogRead(_PIN_BATT_V));
 
-            // Time how long it has been since last health data transmission
-            long health_transmit_timer = millis();
+            // Initialize time since last health data transmission
+            health_transmit_timer = millis();
 
             // Keep checking to see if the battery is okay, 
             // and is above the certain threshold. Keep in mind that we do need 
@@ -288,32 +289,10 @@ void loop() {
 	        // Sean: checking voltage
             while(LPF_get_current_output(&battery_filter) < THRESH_REINIT_SYSTEM)
             {
-                if(LPF_get_current_output(&battery_filter) >= THRESH_LOW_BATT_V)
-                {
-                    long transmit_health = 600000;
-		    if((millis() - health_transmit_timer) >= transmit_health)
-                    {
-                        #ifdef HEALTH_GOOD_APOGEE
-                        if(apogee_voltage >= THRESH_GOOD_APOGEE_V)
-                        #elseif HEALTH_GOOD_PANEL
-                        if(panel_voltage >= THRESH_GOOD_PANEL_V)
-                        #endif
-                        {
-                            pstate_system(__ACTIVE);
-
-                            // Wait for the system to activate
-                            transmit_timer = millis();
-                            delay = 3000;
-                            while((millis() - tranmsit_timer) <= delay);
-
-                            // tranmsit health data
-                            health_data_transmit();
-
-			    health_transmit_timer = millis();
-                        }
-		    }
-                } 
-
+                // Check if we can send the health data
+                // Battery and panel/solar irrandance voltages must be good
+                chkHealth();
+                
                 // Delay every couple of millis
                 // Sean: Update timer to current time
                 #ifdef TESTBENCH_DEBUG
@@ -340,8 +319,8 @@ void loop() {
             // Delay 3 seconds to allow xbee to wake up. Minimum start up time
 	    // should be 1 second at most but 3 seconds to be safe
 		transmit_timer = millis();
-		delay = 3000;
-		while((millis() - transmit_timer) <= delay);
+		int wake_time = 3000;
+		while((millis() - transmit_timer) <= wake_time);
 
 		LPF_filter_init(&battery_filter, battery_filter.output, 0.001);
         }
