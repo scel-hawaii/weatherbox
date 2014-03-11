@@ -113,6 +113,8 @@ P_STATE power_state;
 LowPassFilter battery_filter;
 long battery_sample = 0; 
 
+
+
 /***************************************************
  *      setup()
  *
@@ -121,17 +123,12 @@ long battery_sample = 0;
  *      you may need in here. 
  ***************************************************/
 
+
 void setup() {
     // Set the communication speeds
     Serial.begin(9600);
 
-    #ifdef DEBUG
-        Serial.println("Begin Setup!");
-    #endif
-
-    #ifdef DEBUG_SOFT
-        softserial.print("Begin Setup!");
-    #endif
+    debug_msg("Begin Setup!");
 
     // Wait for everything to settle down
     delay(100);
@@ -145,12 +142,7 @@ void setup() {
     battery_sample = battery_sample / 200;
     LPF_filter_init(&battery_filter, (float)battery_sample, BATT_LOWPASS_ALPHA);
 
-#ifdef DEBUG
-    Serial.println("Begin program!");
-#endif
-#ifdef DEBUG_SOFT
-    Serial.println("Begin program!");
-#endif
+    debug_msg("Begin program!\n");
     
     // Initalize the Xbee depending on which mode we're set to.
     // The TESTBENCH_DEBUG mode assumes we're using software
@@ -178,23 +170,9 @@ softserial.begin(9600);
     // turn the power on!
     pstate_system(__ACTIVE);
 
-#ifdef DEBUG
-    Serial.println("Wait for configuration set..");
-#endif
-
-#ifdef DEBUG_SOFT
-    softserial.println("Wait for configuration set..");
-#endif
-
-    // Wait to make sure configuration finishes
+    debug_msg("Wait for configuration set..\n");
     delay(500);
-
-#ifdef DEBUG
-    Serial.println("Finished with setup!");
-#endif
-#ifdef DEBUG_SOFT
-    Serial.println("Finished with setup!");
-#endif
+    debug_msg("Finished with setup!\n");
 
     // Disabled by Kenny on 02/07/14
     // configureWDT();
@@ -213,25 +191,14 @@ softserial.begin(9600);
 void loop() {
     int batt_voltage = 0; 
     while(1){
+        
     
-        #ifdef TESTBENCH_DEBUG
-        Serial.println("Begin Loop");
-        #endif
-
-        #ifdef DEBUG_SOFT
-        softserial.println("Begin Loop");
-        #endif
+        debug_msg("Begin Loop\n");
 
         // Sean: Update current battery voltage
         LPF_update_filter(&battery_filter, analogRead(_PIN_BATT_V));
 
-        #ifdef TESTBENCH_DEBUG
-        Serial.println("Finished updating filter.");
-        #endif
-
-        #ifdef DEBUG_SOFT
-        softserial.println("Finished updating filter.");
-        #endif
+        debug_msg("Finished updating filter.\n");
 
         // If the battery is good, keep running our routine 
         // TODO: When the power scheme is re-initialized remove the 1 
@@ -240,24 +207,14 @@ void loop() {
 
         batt_voltage = LPF_get_current_output(&battery_filter);
 
-        #ifdef TESTBENCH_DEBUG
-        Serial.println("Our battery voltage is at: ");
-        Serial.println(batt_voltage);
-        #endif
-        #ifdef DEBUG_SOFT
-        softserial.println("Our battery voltage is at: ");
-        softserial.println(batt_voltage);
-        #endif
+        debug_msg("Our battery voltage is at: ");
+        debug_int(batt_voltage);
+        debug_msg("\n");
 
         if(chkHealth() == NORMAL || chkHealth() == GOOD_SOLAR)
         {
-            #ifdef TESTBENCH_DEBUG
-            Serial.println("Voltage is good!");
-            #endif
+            debug_msg("Voltage is good!");
 
-            #ifdef DEBUG_SOFT
-            softserial.println("Voltage is good!");
-            #endif
             // Run the barebones routine forever
             transmit_timer = millis();
             barebones_routine();
@@ -265,13 +222,7 @@ void loop() {
 
         // Otherwise, do this
         else{
-            #ifdef TESTBENCH_DEBUG
-            Serial.println("Voltage is not good!");
-            #endif
-
-            #ifdef DEBUG_SOFT
-            softserial.println("Voltage is not good!");
-            #endif
+            debug_msg("Voltage is not good!\n");
             // Shut down the power, and wait for it to be good
 	        // Sean: Shutting down xbee and sensors
 	        pstate_system(__POWER_SAVE);
@@ -293,16 +244,12 @@ void loop() {
                 sendHealth();
                 
                 // Delay every couple of millis
-                // Sean: Update timer to current time
-                #ifdef TESTBENCH_DEBUG
-                Serial.print("Check if voltage is good anymore:");
-                Serial.println(LPF_get_current_output(&battery_filter));
-                #endif
 
-                #ifdef DEBUG_SOFT
-                softserial.print("Check if voltage is good anymore:");
-                softserial.println(LPF_get_current_output(&battery_filter));
-                #endif
+                // Sean: Update timer to current time
+                debug_msg("Check if voltage is good anymore: ");
+                debug_float(LPF_get_current_output(&battery_filter));
+                debug_msg("\n");
+
 
                 transmit_timer = millis();
                 int delay = 200;
@@ -332,24 +279,12 @@ void barebones_routine(){
     samplePacketBinary();
 	sample_counter++;
 
-    #ifdef DEBUG
-    Serial.print("Sample count: ");
-    Serial.println(sample_counter); 
-    #endif
-
-    #ifdef DEBUG_SOFT
-    softserial.print("Sample count: ");
-    softserial.println(sample_counter); 
-    #endif
+    debug_msg("Sample count: ");
+    debug_int(sample_counter);
+    debug_msg("\n");
 
 	if(sample_counter >= 60) {
-        #ifdef DEBUG
-        Serial.println("Transmitting!");
-        #endif
-
-        #ifdef DEBUG_SOFT
-        softserial.println("Transmitting!");
-        #endif
+        debug_msg("Transmitting!");
 
         transmitPacketBinary(); 
 	    clear_packet();
@@ -523,4 +458,51 @@ void pstate_sensor_array(int state){
 void sync_pstate(void){
     digitalWrite(_PIN_XBEE_SLEEP, !power_state.xbee);
     digitalWrite(_PIN_PSWITCH, power_state.sensor_array);
+}
+
+/**************************************************************
+ * 
+ *
+ * Debug functions to make turning debugging on and off easier
+ *
+ *
+ *************************************************************/
+void debug_msg(char message[]){
+    #ifdef DEBUG
+        Serial.print(message);
+    #endif
+
+    #ifdef DEBUG_SOFT
+        softserial.print(message);
+    #endif
+}
+
+void debug_float(float message){
+    #ifdef DEBUG
+        Serial.print(message);
+    #endif
+
+    #ifdef DEBUG_SOFT
+        softserial.print(message);
+    #endif
+}
+
+void debug_int(int message){
+    #ifdef DEBUG
+        Serial.print(message);
+    #endif
+
+    #ifdef DEBUG_SOFT
+        softserial.print(message);
+    #endif
+}
+
+void debug_double(double message){
+    #ifdef DEBUG
+        Serial.print(message);
+    #endif
+
+    #ifdef DEBUG_SOFT
+        softserial.print(message);
+    #endif
 }
