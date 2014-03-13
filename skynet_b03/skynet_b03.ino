@@ -190,9 +190,12 @@ softserial.begin(9600);
  ***************************************************/
 void loop() {
     int batt_voltage = 0; 
+
+    // Active mode is 1
+    // Command mode is 0
+    int active_mode = 1;
+
     while(1){
-        
-    
         debug_msg("Begin Loop\n");
 
         // Sean: Update current battery voltage
@@ -211,6 +214,8 @@ void loop() {
         debug_int(batt_voltage);
         debug_msg("\n");
 
+        watch_serial();
+
         if(chkHealth() == NORMAL || chkHealth() == GOOD_SOLAR)
         {
             debug_msg("Voltage is good!\n");
@@ -224,8 +229,8 @@ void loop() {
         else{
             debug_msg("Voltage is not good!\n");
             // Shut down the power, and wait for it to be good
-	        // Sean: Shutting down xbee and sensors
-	        pstate_system(__POWER_SAVE);
+            // Sean: Shutting down xbee and sensors
+            pstate_system(__POWER_SAVE);
 
             // Sean: updating battery voltage
             LPF_update_filter(&battery_filter, analogRead(_PIN_BATT_V));
@@ -237,14 +242,13 @@ void loop() {
             // and is above the certain threshold. Keep in mind that we do need 
             // a certain amount of distance between the cutoff voltage and the 
             // re-initialization voltage. 
-	        // Sean: checking voltage
+            // Sean: checking voltage
             while(LPF_get_current_output(&battery_filter) < THRESH_REINIT_SYSTEM)
             {
                 // Send the health data every 10 minutes
                 sendHealth();
                 
-                // Delay every couple of millis
-
+                // Delay every couple of millis 
                 // Sean: Update timer to current time
                 debug_msg("Check if voltage is good anymore: ");
                 debug_float(LPF_get_current_output(&battery_filter));
@@ -255,22 +259,60 @@ void loop() {
                 int delay = 200;
                 while((millis() - transmit_timer) <= delay);
                 LPF_update_filter(&battery_filter, analogRead(_PIN_BATT_V));
+                watch_serial();
             }
             
-            // If we break out of this loop, lets re-initalize all of our systems
-            // to make sure that we're good. 
+            // If we break out of this loop, lets re-initalize all of our systems // to make sure that we're good. 
             // Sean: re-initializing
-	        pstate_system(__ACTIVE);
+            pstate_system(__ACTIVE);
 
             // Delay 3 seconds to allow xbee to wake up. Minimum start up time
-	    // should be 1 second at most but 3 seconds to be safe
-		transmit_timer = millis();
-		int wake_time = 3000;
-		while((millis() - transmit_timer) <= wake_time);
+        // should be 1 second at most but 3 seconds to be safe
+        transmit_timer = millis();
+        int wake_time = 3000;
+        while((millis() - transmit_timer) <= wake_time);
 
-		LPF_filter_init(&battery_filter, battery_filter.output, 0.001);
+        LPF_filter_init(&battery_filter, battery_filter.output, 0.001);
         }
+    }
+}
 
+void watch_serial(){
+    if(Serial.available()){
+        Serial.println("ENTER DEBUG MODE");
+        while(Serial.read() != '\n');
+        while(1){
+            if(Serial.available()){
+                char input = Serial.read();
+                Serial.print("GOT A COMMAND: ");
+                Serial.println(input);
+                while(Serial.read() != '\n');
+                if(input == 'E') {
+                    break;
+                }
+                else{
+                    run_command(input);
+                }
+            }
+        }
+    }
+}
+
+void run_command(char command){
+    switch(command){
+        case 'T':
+            Serial.println("FUN");
+            break;
+        case 'B':
+            Serial.println("CMD: Transmitting binary packet");
+            transmitPacketBinary();
+            break;
+        case 'H':
+            Serial.println("CMD: Transmitting health packet");
+            health_data_transmit();
+            break;
+        default:
+            break;
     }
 }
 
@@ -285,8 +327,7 @@ void barebones_routine(){
 
 	if(sample_counter >= 60) {
         debug_msg("Transmitting!\n");
-
-        transmitPacketBinary(); 
+transmitPacketBinary(); 
 	    clear_packet();
 	    sample_counter = 0;
 	}
