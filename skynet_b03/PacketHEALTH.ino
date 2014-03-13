@@ -29,6 +29,11 @@ void sendHealth(void)
 
     if((millis() - health_transmit_timer) >= transmit_health)
     { 
+            
+        debug_msg("-------------------------------\n");
+        debug_msg("TRANSMIT: Health Data\n");
+        debug_msg("-------------------------------\n");
+
         // Power on system to transmit health data
         pstate_system(__ACTIVE);
 

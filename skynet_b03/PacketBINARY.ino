@@ -80,6 +80,9 @@ void samplePacketBinary(void)
  ***************************************************/
 void transmitPacketBinary()
 {
+    debug_msg("\n------------------------------\n");
+    debug_msg("TRANSMIT: Binary Packet \n");
+    debug_msg("------------------------------\n");
     // Empty for now
     memset(rf_payload, '\0', sizeof(rf_payload));
     memcpy(rf_payload, &packet, sizeof(packet));

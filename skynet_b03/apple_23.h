@@ -9,13 +9,35 @@
  */
 #define APPLE_VERSION 23
 
-// Define different operation modes here
-// #define TESTBENCH_DEBUG
-// #define DEBUG
+
+// =========================================
+// 
+//  DEBUG CONFIGURATION FLAGS
+//
+// ==========================================
+
+// Enable the following modes below by UNCOMMENTING them:
+
+//
+#define TESTBENCH_DEBUG
+
+//
+#define DEBUG
+
+// 
 // #define DEBUG_SOFT
+// 
+
+//
+// Configure normal operation (CURRENTLY NOT TESTED)
+// 
 // #define NORMAL_OPERATION
 
-// pins!
+// =========================================
+// 
+//  PIN CONFIGURATION (Do not change!)
+//
+// ==========================================
 #define _PIN_ANEMOMETER0 A0
 #define _PIN_ANEMOMETER1 10
 #define _PIN_ANEMOMETER2 11
@@ -38,7 +60,6 @@
 
 #define _PIN_HUMID_CLK 7
 #define _PIN_HUMID_DATA 8
-
 
 #define _PIN_SOLAR_V A1 
 #define _PIN_APOGEE_V A2

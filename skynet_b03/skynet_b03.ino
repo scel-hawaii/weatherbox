@@ -213,7 +213,7 @@ void loop() {
 
         if(chkHealth() == NORMAL || chkHealth() == GOOD_SOLAR)
         {
-            debug_msg("Voltage is good!");
+            debug_msg("Voltage is good!\n");
 
             // Run the barebones routine forever
             transmit_timer = millis();
@@ -284,7 +284,7 @@ void barebones_routine(){
     debug_msg("\n");
 
 	if(sample_counter >= 60) {
-        debug_msg("Transmitting!");
+        debug_msg("Transmitting!\n");
 
         transmitPacketBinary(); 
 	    clear_packet();
