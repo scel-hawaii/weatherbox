@@ -111,7 +111,9 @@ struct P_STATE{
 P_STATE power_state;
 
 LowPassFilter battery_filter;
+LowPassFilter solar_filter;
 long battery_sample = 0; 
+long solar_sample = 0;
 
 
 
@@ -138,9 +140,12 @@ void setup() {
     // by making that it initial sample.
     for(i = 0; i < 200 ; i ++) {
         battery_sample += analogRead(_PIN_BATT_V);
+	solar_sample += analogRead(_PIN_APOGEE_V);
     }
     battery_sample = battery_sample / 200;
+    solar_sample = solar_sample / 200;
     LPF_filter_init(&battery_filter, (float)battery_sample, BATT_LOWPASS_ALPHA);
+    LPF_filter_init(&solar_filter, (float)solar_sample, BATT_LOWPASS_ALPHA);
 
     debug_msg("Begin program!\n");
     
@@ -199,7 +204,9 @@ void loop() {
         debug_msg("Begin Loop\n");
 
         // Sean: Update current battery voltage
+	// as well as solar irradiance voltage
         LPF_update_filter(&battery_filter, analogRead(_PIN_BATT_V));
+        LPF_update_filter(&solar_filter, analogRead(_PIN_APOGEE_V));
 
         debug_msg("Finished updating filter.\n");
 
@@ -267,12 +274,13 @@ void loop() {
             pstate_system(__ACTIVE);
 
             // Delay 3 seconds to allow xbee to wake up. Minimum start up time
-        // should be 1 second at most but 3 seconds to be safe
-        transmit_timer = millis();
-        int wake_time = 3000;
-        while((millis() - transmit_timer) <= wake_time);
+            // should be 1 second at most but 3 seconds to be safe
+            transmit_timer = millis();
+            int wake_time = 3000;
+            while((millis() - transmit_timer) <= wake_time);
 
-        LPF_filter_init(&battery_filter, battery_filter.output, 0.001);
+            LPF_filter_init(&battery_filter, battery_filter.output, BATT_LOWPASS_ALPHA);
+            LPF_filter_init(&solar_filter, solar_filter.output, BATT_LOWPASS_ALPHA);
         }
     }
 }
@@ -327,7 +335,7 @@ void barebones_routine(){
 
 	if(sample_counter >= 60) {
         debug_msg("Transmitting!\n");
-transmitPacketBinary(); 
+        transmitPacketBinary(); 
 	    clear_packet();
 	    sample_counter = 0;
 	}
