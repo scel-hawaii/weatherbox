@@ -115,7 +115,7 @@ LowPassFilter solar_filter;
 long battery_sample = 0; 
 long solar_sample = 0;
 
-
+schema_6 debug_text;
 
 /***************************************************
  *      setup()
@@ -127,6 +127,7 @@ long solar_sample = 0;
 
 
 void setup() {
+    debug_text.schema = 6;
     // Set the communication speeds
     #ifdef TESTBENCH_DEBUG
     Serial.begin(115200);
@@ -136,6 +137,7 @@ void setup() {
 
 
     debug_msg("Begin Setup!");
+    sendDebugPacket("Begin program!");
 
     // Wait for everything to settle down
     delay(100);
@@ -186,7 +188,6 @@ softserial.begin(9600);
 
     // Disabled by Kenny on 02/07/14
     // configureWDT();
-    
 }
 
 /***************************************************
@@ -323,6 +324,10 @@ void run_command(char command){
         case 'H':
             Serial.println("CMD: Transmitting health packet");
             health_data_transmit();
+            break;
+        case 'D':
+            Serial.println("CMD: Transmitting a debug packet");
+            sendDebugPacket("Here I am debugging!");
             break;
         default:
             break;
@@ -559,4 +564,18 @@ void debug_double(double message){
     #ifdef DEBUG_SOFT
         softserial.print(message);
     #endif
+}
+
+void sendDebugPacket(char *dtext){
+    debug_text.schema = 6;
+    strcpy(debug_text.text, dtext);
+    transmitDebug();
+}
+
+void transmitDebug(void) {
+    debug_text.schema = 6;
+    memset(rf_payload, '\0', sizeof(rf_payload));
+    memcpy(rf_payload, &debug_health, sizeof(debug_text));
+    ZBTxRequest zbtx = ZBTxRequest(addr64, rf_payload, sizeof(health));
+    xbee.send(zbtx);
 }
