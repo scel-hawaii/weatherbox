@@ -328,6 +328,9 @@ void run_command(char command){
         case 'D':
             Serial.println("CMD: Transmitting a debug packet");
             sendDebugPacket("Here I am debugging!");
+            sendDebugPacket("Here I am debugging!");
+            sendDebugPacket("Here I am debugging!");
+            sendDebugPacket("I like debugging very much!");
             break;
         default:
             break;
@@ -576,6 +579,6 @@ void transmitDebug(void) {
     debug_text.schema = 6;
     memset(rf_payload, '\0', sizeof(rf_payload));
     memcpy(rf_payload, &debug_text, sizeof(debug_text));
-    ZBTxRequest zbtx = ZBTxRequest(addr64, rf_payload, sizeof(health));
+    ZBTxRequest zbtx = ZBTxRequest(addr64, rf_payload, sizeof(debug_text));
     xbee.send(zbtx);
 }
