@@ -575,7 +575,7 @@ void sendDebugPacket(char *dtext){
 void transmitDebug(void) {
     debug_text.schema = 6;
     memset(rf_payload, '\0', sizeof(rf_payload));
-    memcpy(rf_payload, &debug_health, sizeof(debug_text));
+    memcpy(rf_payload, &debug_text, sizeof(debug_text));
     ZBTxRequest zbtx = ZBTxRequest(addr64, rf_payload, sizeof(health));
     xbee.send(zbtx);
 }
