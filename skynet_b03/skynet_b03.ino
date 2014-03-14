@@ -128,7 +128,12 @@ long solar_sample = 0;
 
 void setup() {
     // Set the communication speeds
+    #ifdef TESTBENCH_DEBUG
+    Serial.begin(115200);
+    #else
     Serial.begin(9600);
+    #endif
+
 
     debug_msg("Begin Setup!");
 
