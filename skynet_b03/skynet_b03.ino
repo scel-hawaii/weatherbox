@@ -147,7 +147,7 @@ void setup() {
     // by making that it initial sample.
     for(i = 0; i < 200 ; i ++) {
         battery_sample += analogRead(_PIN_BATT_V);
-	solar_sample += analogRead(_PIN_APOGEE_V);
+	    solar_sample += analogRead(_PIN_APOGEE_V);
     }
     battery_sample = battery_sample / 200;
     solar_sample = solar_sample / 200;
@@ -292,6 +292,7 @@ void loop() {
 }
 
 void watch_serial(){
+
     if(Serial.available()){
         Serial.println("ENTER DEBUG MODE");
         while(Serial.read() != '\n');
@@ -310,8 +311,8 @@ void watch_serial(){
             }
         }
     }
-}
 
+}
 void run_command(char command){
     switch(command){
         case 'T':
@@ -328,10 +329,11 @@ void run_command(char command){
         case 'D':
             Serial.println("CMD: Transmitting a debug packet");
             sendDebugPacket("Here I am debugging!");
-            sendDebugPacket("Here I am debugging!");
-            sendDebugPacket("Here I am debugging!");
-            sendDebugPacket("I like debugging very much!");
             break;
+        // Get the current attached Xbee's Address and transmit it
+        case 'A':
+            break;
+
         default:
             break;
     }

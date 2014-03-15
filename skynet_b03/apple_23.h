@@ -19,10 +19,10 @@
 // Enable the following modes below by UNCOMMENTING them:
 
 //
-#define TESTBENCH_DEBUG
+// #define TESTBENCH_DEBUG
 
 //
-#define DEBUG
+// #define DEBUG
 
 // 
 // #define DEBUG_SOFT
@@ -112,6 +112,9 @@
 #define ADC_SAMPLE_NUM 30 
 
 // This defines the alpha value for the battery lowpass filter
+#define BATT_LOWPASS_ALPHA 0.005
+
+// This defines the alpha value for the solar lowpass filter
 #define BATT_LOWPASS_ALPHA 0.005
 
 
