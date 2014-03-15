@@ -135,7 +135,6 @@ void setup() {
     Serial.begin(9600);
     #endif
 
-
     debug_msg("Begin Setup!");
     sendDebugPacket("Begin program!");
 
@@ -160,12 +159,12 @@ void setup() {
     // The TESTBENCH_DEBUG mode assumes we're using software
     // serial for the xbee
 
-softserial.begin(9600);
-#ifdef TESTBENCH_DEBUG 
-    xbee.begin(softserial);
-#else
-    xbee.begin(Serial);
-#endif
+    softserial.begin(9600);
+    #ifdef TESTBENCH_DEBUG 
+        xbee.begin(softserial);
+    #else
+        xbee.begin(Serial);
+    #endif
 
     bmp085.begin();
     ina219_Solar.begin();
@@ -228,6 +227,7 @@ void loop() {
         debug_msg("\n");
 
         watch_serial();
+        debug_msg("Finished watching serial\n");
 
         if(chkHealth() == NORMAL || chkHealth() == GOOD_SOLAR)
         {
@@ -292,7 +292,7 @@ void loop() {
 }
 
 void watch_serial(){
-
+    #ifdef DEBUG
     if(Serial.available()){
         Serial.println("ENTER DEBUG MODE");
         while(Serial.read() != '\n');
@@ -311,7 +311,7 @@ void watch_serial(){
             }
         }
     }
-
+    #endif
 }
 void run_command(char command){
     switch(command){

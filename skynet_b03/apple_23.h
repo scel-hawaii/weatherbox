@@ -26,7 +26,6 @@
 
 // 
 // #define DEBUG_SOFT
-// 
 
 //
 // Configure normal operation (CURRENTLY NOT TESTED)
