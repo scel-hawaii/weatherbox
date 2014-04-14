@@ -14,17 +14,27 @@
 // 
 //  DEBUG CONFIGURATION FLAGS
 //
+//  Enable  the following modes below by UNCOMMENTING them.
 // ==========================================
 
-// Enable the following modes below by UNCOMMENTING them:
 
-//
+// This enables our testbench debug platform. The testbench debug platform is 
+// used primarily for testing on the ground. 
+// It does primarily two things:
+//  * switches the xbee to softwareserial (12, 11) (TX, RX)
+//  * switches our debug messages to the hardware serial
+// 
 // #define TESTBENCH_DEBUG
 
+// This flag enables our debug messages.
 //
 // #define DEBUG
 
-// 
+// This flag enables debug messages on the softwareserial port (12, 11)(TX,RX).
+// Primarily useful for testing when the board is already in production.
+// TODO: This will be the primary debug mode later on, since we can program 
+// specifically using the avrisp mkii now. 
+// =============================================================================
 // #define DEBUG_SOFT
 
 //
