@@ -1,17 +1,14 @@
-**********************************************
-*       Weatherbox Version: skynet_b03
-**********************************************
+Weatherbox Version: skynet-b03
+=================================
 
-Major version changes:
-----------------------------------------------
+### Major version changes:
 * Restructured program and more modularized code
 * Getting ready for on the fly config changes
     via UART.
 * Dual binary and UART packet capability 
 
 
-Major Changelog (See git log for minor notes):
-----------------------------------------------
+### Major Changelog (See git log for minor notes):
 8/23/13 - Sean Hara
 
 BETTER better test update.
@@ -33,17 +30,14 @@ being split up by the xbee's firmware. More research to be
 done later. 
 
 
-**********************************************
-*       Weatherbox Version: skynet_b01
-**********************************************
+Weatherbox Version: skynet-b01
+=================================
 
-Major version changes:
-----------------------------------------------
+### Major version changes:
 * Re-worked previous "alpha version" code
 * Consolidated changes into one file, and released major version
 
 Major Changelog (See git log for minor notes):
-----------------------------------------------
 UNKNOWN DATE - Kenny Luong
 
 Found out that the arduino has some strange behavior with the  
