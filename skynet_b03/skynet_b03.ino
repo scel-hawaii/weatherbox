@@ -93,7 +93,8 @@ int len;
 uint8_t rf_payload[243];
 
 //schema_1 packet;
-schema_3 packet;
+//schema_3 packet;
+schema_4 packet;     // contains overflow counter for millis()
 schema_health health;
 
 // count number of samples taken
@@ -359,7 +360,7 @@ void barebones_routine(){
     // and once it has passed, we reset that timer again.
     // This way, we sample exactly every second
     long wait_millis = 1000;
-    while( (millis() -  transmit_timer) <= wait_millis );
+    while((millis() -  transmit_timer) <= wait_millis );
 }
 
 

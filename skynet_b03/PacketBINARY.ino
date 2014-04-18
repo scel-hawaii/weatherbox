@@ -18,6 +18,7 @@ void clear_packet(void)
 {
     packet.schema = 3;
     packet.address = address;
+    packet.overflow_num = 0;
     packet.uptime_ms = 0;
     packet.n = 0;
     packet.bmp085_press_pa = 0;
@@ -49,7 +50,15 @@ void clear_packet(void)
 void samplePacketBinary(void)
 {
         int n = packet.n;
-        packet.uptime_ms = millis();
+	
+
+        // Checking if millis() has overflowed
+        // If the previous uptime is greater than the current millis()
+        // an overflow has occurred.
+        unsigned long uptime = millis();
+        if((uptime - packet.uptime_ms) < 0)
+            packet.overflow_num++;
+        packet.uptime_ms = uptime;
 
 	    // initialize values
         int i; float batt_mv_raw = 0, panel_mv_raw = 0, apogee_raw = 0;
