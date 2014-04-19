@@ -63,6 +63,7 @@ void samplePacketBinary(void)
         packet.panel_mv[n/10] = panel_mv_raw;
         packet.bmp085_press_pa = bmp085.readPressure();
         packet.bmp085_temp_decic = bmp085.readTemperature()*10;
+        packet.humidity_centi_pct = sht1x.readHumidity();
         packet.apogee_w_m2[n/3] = apogee_raw;
         packet.n += 1;
 
