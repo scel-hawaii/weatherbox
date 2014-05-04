@@ -60,9 +60,9 @@ Adafruit_BMP085 bmp085;
 Adafruit_INA219 ina219_Solar;
 
 #ifdef TESTBENCH_DEBUG
-SoftwareSerial softserial(12, 11); //RX, TX
+SoftwareSerial softserial(4, 5); //RX, TX
 #else
-SoftwareSerial softserial(12, 11); //RX, TX
+SoftwareSerial softserial(4, 5); //RX, TX
 #endif
 
 XBee xbee = XBee();
