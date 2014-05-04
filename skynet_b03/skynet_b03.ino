@@ -292,7 +292,7 @@ void loop() {
 }
 
 void watch_serial(){
-    #ifdef DEBUG_WATCHING
+    #ifdef DEBUG_WATCH
     if(Serial.available()){
         Serial.println("ENTER DEBUG MODE");
         while(Serial.read() != '\n');
