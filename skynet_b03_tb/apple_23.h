@@ -24,6 +24,9 @@
 
 #define DEBUG_SOFT
 
+// Enable debug watching (so that we can pull the microcontroller into debug mode
+#define DEBUG_WATCH
+
 //
 // Configure normal operation (CURRENTLY NOT TESTED)
 // 
