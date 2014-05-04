@@ -298,7 +298,7 @@ void watch_serial(){
         while(softserial.read() != '\n');
         while(1){
             if(softserial.available()){
-                char input = Serial.read();
+                char input = softserial.read();
                 softserial.print("GOT A COMMAND: ");
                 softserial.println(input);
                 while(softserial.read() != '\n');
