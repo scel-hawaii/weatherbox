@@ -293,15 +293,15 @@ void loop() {
 
 void watch_serial(){
     #ifdef DEBUG_WATCH
-    if(Serial.available()){
-        Serial.println("ENTER DEBUG MODE");
-        while(Serial.read() != '\n');
+    if(softserial.available()){
+        softserial.println("ENTER DEBUG MODE");
+        while(softserial.read() != '\n');
         while(1){
-            if(Serial.available()){
+            if(softserial.available()){
                 char input = Serial.read();
-                Serial.print("GOT A COMMAND: ");
-                Serial.println(input);
-                while(Serial.read() != '\n');
+                softserial.print("GOT A COMMAND: ");
+                softserial.println(input);
+                while(softserial.read() != '\n');
                 if(input == 'E') {
                     break;
                 }
