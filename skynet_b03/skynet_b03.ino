@@ -14,7 +14,7 @@
  ****************************************************/
 #include "skynet_b03.h"
 #include "low_pass.h"
-#include "millis_overflow.h"
+#include "overflow_checker.h"
 
 /* Can't move libraries into skynet_b03.h. For some reason the program will 
    not compile if that happens. */
