@@ -56,8 +56,7 @@ void samplePacketBinary(void)
         // If the previous uptime is greater than the current millis()
         // an overflow has occurred.
         unsigned long uptime = millis();
-        if((uptime - packet.uptime_ms) < 0)
-            packet.overflow_num++;
+        packet.overflow_num += chk_overflow(uptime, packet.uptime_ms);
         packet.uptime_ms = uptime;
 
 	    // initialize values
