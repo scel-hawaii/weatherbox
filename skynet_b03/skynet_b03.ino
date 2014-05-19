@@ -93,9 +93,7 @@ int len;
 // payload used for PacketBINARY transmission
 uint8_t rf_payload[243];
 
-//schema_1 packet;
-//schema_3 packet;
-schema_4 packet;     // contains overflow counter for millis()
+schema_3 packet;
 schema_health health;
 
 // count number of samples taken
