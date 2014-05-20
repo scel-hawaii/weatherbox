@@ -1,8 +1,6 @@
 Weatherbox
 ============================
 
-
-
 ## Motivation
 
 This is the primary directory for the reis weatherbox project. The goal of the reis weatherbox
@@ -17,6 +15,7 @@ The current firmware release is skynet-b03.
 * Sean Hara
 * Zachary Dorman
 * Christie Obatake 
+* Ryan Walser
 
 
 ## Arduino IDE Library Setup
