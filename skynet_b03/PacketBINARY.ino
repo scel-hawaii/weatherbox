@@ -18,7 +18,6 @@ void clear_packet(void)
 {
     packet.schema = 3;
     packet.address = address;
-    packet.overflow_num = 0;
     packet.uptime_ms = 0;
     packet.n = 0;
     packet.bmp085_press_pa = 0;
@@ -51,22 +50,17 @@ void samplePacketBinary(void)
 {
         int n = packet.n;
 	
+        // Update current time
+        packet.uptime_ms = millis();
 
-        // Checking if millis() has overflowed
-        // If the previous uptime is greater than the current millis()
-        // an overflow has occurred.
-        unsigned long uptime = millis();
-        packet.overflow_num += chk_overflow(uptime, packet.uptime_ms);
-        packet.uptime_ms = uptime;
-
-	    // initialize values
+        // initialize values
         int i; float batt_mv_raw = 0, panel_mv_raw = 0, apogee_raw = 0;
 
         batt_mv_raw = analogRead(_PIN_BATT_V)*5000.0/1023;
         panel_mv_raw = 2*analogRead(_PIN_SOLAR_V)*5000.0/1023;
         apogee_raw = analogRead(_PIN_APOGEE_V)*5000.0/1023;
 
-	    // Save values to packet
+        // Save values to packet
         packet.batt_mv[n/10] = batt_mv_raw;
         packet.panel_mv[n/10] = panel_mv_raw;
         packet.bmp085_press_pa = bmp085.readPressure();

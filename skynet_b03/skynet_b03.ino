@@ -103,6 +103,11 @@ long sample_counter = 0;
 unsigned long transmit_timer = 0; 
 unsigned long health_transmit_timer = 0;
 
+// Timers used for overflow
+uint32_t current_time = 0;
+uint32_t previous_time = 0; 
+uint8_t overflow_count = 0;
+
 struct P_STATE{
     int xbee;
     int sensor_array;
@@ -231,6 +236,15 @@ void loop() {
 
         if(chkHealth() == NORMAL || chkHealth() == GOOD_SOLAR)
         {
+            // Check if an overflow has occurred.
+            current_time = millis();
+            if(chk_overflow(current_time, previous_time))
+            {
+                packet.overflow_num = ++overflow_count;
+                health.overflow_num = overflow_count;
+            }
+            previous_time = current_time;
+
             debug_msg("Voltage is good!\n");
 
             // Run the barebones routine forever
@@ -258,6 +272,15 @@ void loop() {
             // Sean: checking voltage
             while(LPF_get_current_output(&battery_filter) < THRESH_REINIT_SYSTEM)
             {
+                // Check if an overflow has occurred.
+                current_time = millis();
+                if(chk_overflow(current_time, previous_time))
+                {
+                    packet.overflow_num = ++overflow_count;
+                    health.overflow_num = overflow_count;
+                }
+                previous_time = current_time;
+
                 // Send the health data every 10 minutes
                 sendHealth();
                 
