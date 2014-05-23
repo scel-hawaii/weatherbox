@@ -12,7 +12,7 @@
  *          - Confirmed xbee needs to be in router
  *
  ****************************************************/
-#include "skynet_b03.h"
+#include "skynet.h"
 #include "low_pass.h"
 #include "overflow_checker.h"
 
