@@ -1,8 +1,5 @@
 // Sensors.h
 
-#ifndef SENSORS_H
-#define SENSORS_H
-
 #include "apple_23.h"
 #include <SHT1x.h>
 #include <OneWire.h>
@@ -10,16 +7,19 @@
 #include <Adafruit_INA219.h>
 #include <Adafruit_BMP085.h>
 
-OneWire oneWire1(_PIN_AMB_TEMP);
-DallasTemperature dallas_amb_sen(&oneWire1);
+#ifndef BLAH_H
+#define BLAH_H
 
-OneWire oneWire2(_PIN_ROOF_TEMP);
-DallasTemperature dallas_roof_sen(&oneWire2);
+extern OneWire oneWire1;
+extern DallasTemperature dallas_amb_sen;
 
-SHT1x sht1x(_PIN_HUMID_DATA, _PIN_HUMID_CLK);
+extern OneWire oneWire2;
+extern DallasTemperature dallas_roof_sen;
 
-Adafruit_BMP085 bmp085;
-Adafruit_INA219 ina219_Solar;
+extern SHT1x sht1x;
+
+extern Adafruit_BMP085 bmp085;
+extern Adafruit_INA219 ina219_Solar;
 
 int Sensors_sampleBatterymV(void);
 int Sensors_samplePanelmV(void);

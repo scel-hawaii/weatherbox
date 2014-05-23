@@ -82,7 +82,7 @@ void setup() {
     // configureADC();
 
     // Initialize the packet!
-    Packet_init();
+    Packet_init(address);
 
     // turn the power on!
     pstate_system(__ACTIVE);
@@ -257,7 +257,7 @@ void barebones_routine(){
 	if(sample_counter >= 60) {
         debug_msg("Transmitting!\n");
         Packet_transmitPacketBinary(); 
-	    Packet_init();
+	    Packet_init(address);
 	    sample_counter = 0;
 	}
 
@@ -292,7 +292,7 @@ void sampleANDtransmit(void){
 	        // Check if desired amount of samples for transmit have been taken
             if(sample_counter == _CONFIG_TransmitPeriod) {
                 Packet_transmitPacketBinary(); 
-                Packet_init();
+                Packet_init(address);
                 sample_counter = 0;  // Clear the sample counter
             }
 #endif

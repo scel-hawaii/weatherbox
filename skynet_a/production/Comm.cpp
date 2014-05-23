@@ -13,6 +13,9 @@
  *  Xbee library for arduino can be found online.
  *
  ***************************************************/
+XBee xbee;
+XBeeAddress64 addr64;
+
 void Comm_initXbee(void){
     xbee = XBee();
     addr64 = XBeeAddress64(0, 0);

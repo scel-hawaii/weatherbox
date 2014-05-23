@@ -4,6 +4,7 @@
  *
  ****************************************************/
 #include "PacketBINARY.h"
+schema_3 packet;
 
 /***************************************************
  *  Name:        clear_packet()
@@ -14,7 +15,7 @@
  *  This function zeros out the binary packet before transmission
  *
  ***************************************************/
-void Packet_init(int address)
+void Packet_init(long address)
 {
     packet.schema = 3;
     packet.address = address;

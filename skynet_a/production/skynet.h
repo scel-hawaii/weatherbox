@@ -17,15 +17,12 @@
    not compile if that happens. */
 
 // explain what libraries are for and where to find them
-#include <Wire.h>
 #include <SoftwareSerial.h>
 #include <XBee.h>
 
 #include <EEPROM.h>
 
 #include "schema.h"
-#include "sleep.h"
-#include "apple_23.h"
 #include "Debug.h"
 #include "Comm.h"
 #include "PacketHEALTH.h"
