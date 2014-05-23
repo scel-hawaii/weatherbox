@@ -1,3 +1,4 @@
+#include "ADC.h"
 // Define various ADC prescaler
 const unsigned char PS_16 = (1 << ADPS2);
 const unsigned char PS_32 = (1 << ADPS2) | (1 << ADPS0);

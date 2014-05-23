@@ -7,6 +7,10 @@
  *      for apple 2.3
  * =========================================================
  */
+
+#ifndef APPLE_23_H
+#define APPLE_23_H
+
 #define APPLE_VERSION 23
 
 
@@ -139,3 +143,5 @@ const int _CONFIG_TransmitPeriod = 60; // determines how often packet transmits
 #define pMode_NORMAL 0
 #define pMode_POWERSAVE 1
 #define POWERSAVE
+
+#endif

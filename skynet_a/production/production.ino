@@ -13,32 +13,6 @@
  *
  ****************************************************/
 #include "skynet.h"
-#include "low_pass.h"
-#include "overflow_checker.h"
-
-/* Can't move libraries into skynet_b03.h. For some reason the program will 
-   not compile if that happens. */
-
-// explain what libraries are for and where to find them
-#include <Wire.h>
-#include <Adafruit_BMP085.h>
-#include <SoftwareSerial.h>
-#include <XBee.h>
-#include <Adafruit_INA219.h>
-
-#include <EEPROM.h>
-
-#include <avr/sleep.h>
-#include <avr/power.h>
-#include <avr/wdt.h>
-
-#include <SHT1x.h>
-#include <OneWire.h>
-#include <DallasTemperature.h>
-
-#include "schema.h"
-#include "sleep.h"
-#include "apple_23.h"
 
 #define FALSE 0
 #define TRUE 1
@@ -49,73 +23,12 @@
 #define __ACTIVE 1
 #define __POWER_SAVE 0
 
-OneWire oneWire1(_PIN_AMB_TEMP);
-DallasTemperature dallas_amb_sen(&oneWire1);
-
-OneWire oneWire2(_PIN_ROOF_TEMP);
-DallasTemperature dallas_roof_sen(&oneWire2);
-
-SHT1x sht1x(_PIN_HUMID_DATA, _PIN_HUMID_CLK);
-
-Adafruit_BMP085 bmp085;
-Adafruit_INA219 ina219_Solar;
-
 #ifdef TESTBENCH_DEBUG
 SoftwareSerial softserial(4, 5); //RX, TX
 #else
 SoftwareSerial softserial(4, 5); //RX, TX
 #endif
 
-XBee xbee = XBee();
-XBeeAddress64 addr64 = XBeeAddress64(0, 0);
-
-// Payload used for PacketUART transmission
-uint8_t payload[243];
-
-// Grab the address from the Arduino EEPROM 
-long address = EEPROM.read(2) | (EEPROM.read(3)<<8);
-
-long batt_mv, panel_mv, panel_ua;
-long bmp085_temp_decic;
-long bmp085_press_pa;
-long apogee_mv, apogee_w_m2;
-long dallas_rooftemp_c, dallas_ambtemp_c;
-
-unsigned int i; // generic counter
-unsigned int pMode;
-
-// string used for PacketUART
-String s; 
-
-// length of payload (used in PacketUART) 
-int len;
-
-// payload used for PacketBINARY transmission
-uint8_t rf_payload[243];
-
-schema_3 packet;
-schema_health health;
-
-// count number of samples taken
-long sample_counter = 0; 
-
-// global timers
-unsigned long transmit_timer = 0; 
-unsigned long health_transmit_timer = 0;
-
-struct P_STATE{
-    int xbee;
-    int sensor_array;
-};
-
-P_STATE power_state;
-
-LowPassFilter battery_filter;
-LowPassFilter solar_filter;
-long battery_sample = 0; 
-long solar_sample = 0;
-
-schema_6 debug_text;
 
 /***************************************************
  *      setup()
@@ -124,8 +37,6 @@ schema_6 debug_text;
  *      sequence, before the setup function. Put any init scripts 
  *      you may need in here. 
  ***************************************************/
-
-
 void setup() {
     debug_text.schema = 6;
     // Set the communication speeds
@@ -160,14 +71,9 @@ void setup() {
     // serial for the xbee
 
     softserial.begin(9600);
-    #ifdef TESTBENCH_DEBUG 
-        xbee.begin(softserial);
-    #else
-        xbee.begin(Serial);
-    #endif
 
-    bmp085.begin();
-    ina219_Solar.begin();
+    Comm_initXbee();
+
     
     // Configuration Scripts
     configurePins();
@@ -176,7 +82,7 @@ void setup() {
     // configureADC();
 
     // Initialize the packet!
-    clear_packet();
+    Packet_init();
 
     // turn the power on!
     pstate_system(__ACTIVE);
@@ -320,7 +226,7 @@ void run_command(char command){
             break;
         case 'B':
             Serial.println("CMD: Transmitting binary packet");
-            transmitPacketBinary();
+            Packet_transmitPacketBinary();
             break;
         case 'H':
             Serial.println("CMD: Transmitting health packet");
@@ -341,7 +247,7 @@ void run_command(char command){
 
 void barebones_routine(){
     // sample and then increment the sample counter
-    samplePacketBinary();
+    Packet_samplePacketBinary();
 	sample_counter++;
 
     debug_msg("Sample count: ");
@@ -350,8 +256,8 @@ void barebones_routine(){
 
 	if(sample_counter >= 60) {
         debug_msg("Transmitting!\n");
-        transmitPacketBinary(); 
-	    clear_packet();
+        Packet_transmitPacketBinary(); 
+	    Packet_init();
 	    sample_counter = 0;
 	}
 
@@ -381,12 +287,12 @@ void sampleANDtransmit(void){
             transmitPacketUART();
 #endif
 #ifdef PACKET_BINARY:
-            samplePacketBinary();
+            Packet_samplePacketBinary();
             sample_counter++;
 	        // Check if desired amount of samples for transmit have been taken
             if(sample_counter == _CONFIG_TransmitPeriod) {
-                transmitPacketBinary(); 
-                clear_packet();
+                Packet_transmitPacketBinary(); 
+                Packet_init();
                 sample_counter = 0;  // Clear the sample counter
             }
 #endif
@@ -447,12 +353,12 @@ void configurePins(void){
 void transmitPacketHello(void){
     if(_CONFIG_PacketFormat == PACKET_BIN)
     {
-        samplePacketBinary();
-        samplePacketBinary();
-        samplePacketBinary();
-        samplePacketBinary();
-        samplePacketBinary();
-        transmitPacketBinary();
+        Packet_samplePacketBinary();
+        Packet_samplePacketBinary();
+        Packet_samplePacketBinary();
+        Packet_samplePacketBinary();
+        Packet_samplePacketBinary();
+        Packet_transmitPacketBinary();
     }
 
 }
@@ -524,52 +430,6 @@ void sync_pstate(void){
     digitalWrite(_PIN_PSWITCH, power_state.sensor_array);
 }
 
-/**************************************************************
- * 
- *
- * Debug functions to make turning debugging on and off easier
- *
- *
- *************************************************************/
-void debug_msg(char message[]){
-    #ifdef DEBUG
-        Serial.print(message);
-    #endif
-
-    #ifdef DEBUG_SOFT
-        softserial.print(message);
-    #endif
-}
-
-void debug_float(float message){
-    #ifdef DEBUG
-        Serial.print(message);
-    #endif
-
-    #ifdef DEBUG_SOFT
-        softserial.print(message);
-    #endif
-}
-
-void debug_int(int message){
-    #ifdef DEBUG
-        Serial.print(message);
-    #endif
-
-    #ifdef DEBUG_SOFT
-        softserial.print(message);
-    #endif
-}
-
-void debug_double(double message){
-    #ifdef DEBUG
-        Serial.print(message);
-    #endif
-
-    #ifdef DEBUG_SOFT
-        softserial.print(message);
-    #endif
-}
 
 void sendDebugPacket(char *dtext){
     debug_text.schema = 6;

@@ -7,6 +7,7 @@
  *          microcontroller, since we aren't processing 100% of the time.
  *
  ****************************************************/
+ #include "sleep.h"
 
 /***************************************************
  *  Name:        configureWDT
@@ -41,6 +42,7 @@ void configureWDT(void){
  *  Description: Watchdog Interrupt Service. This
  *               is executed when watchdog timed out.
  ***************************************************/
+/*
 ISR(WDT_vect)
 {
     if(f_wdt == 0) {
@@ -52,6 +54,7 @@ ISR(WDT_vect)
         #endif
     }
 }
+*/
 
 /***************************************************
  *  Name:        enterSleep
@@ -76,5 +79,5 @@ void enterSleep(void)
   sleep_disable(); /* First thing to do is disable sleep. */
   
   /* Re-enable the peripherals. */
-  power_all_enable();
+  // power_all_enable();
 }

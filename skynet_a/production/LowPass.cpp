@@ -1,4 +1,4 @@
-#include "low_pass.h"
+#include "LowPass.h"
 /* Initialize the filter */
 void LPF_filter_init(LowPassFilter* f, float o, float a){
     f->output = o;

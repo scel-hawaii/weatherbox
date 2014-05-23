@@ -8,6 +8,72 @@
  ****************************************************/
 
 
+#ifndef SKYNET_H
+#define SKYNET_H
+#include "LowPass.h"
+#include "overflow_checker.h"
+
+/* Can't move libraries into skynet_b03.h. For some reason the program will 
+   not compile if that happens. */
+
+// explain what libraries are for and where to find them
+#include <Wire.h>
+#include <SoftwareSerial.h>
+#include <XBee.h>
+
+#include <EEPROM.h>
+
+#include "schema.h"
+#include "sleep.h"
+#include "apple_23.h"
+#include "Debug.h"
+#include "Comm.h"
+#include "PacketHEALTH.h"
+#include "PacketBINARY.h"
+
+// Payload used for PacketUART transmission
+uint8_t payload[243];
+
+// Grab the address from the Arduino EEPROM 
+long address = EEPROM.read(2) | (EEPROM.read(3)<<8);
+
+
+unsigned int i; // generic counter
+unsigned int pMode;
+
+// string used for PacketUART
+String s; 
+
+// length of payload (used in PacketUART) 
+int len;
+
+// payload used for PacketBINARY transmission
+uint8_t rf_payload[243];
+
+schema_health health;
+
+// count number of samples taken
+long sample_counter = 0; 
+
+// global timers
+unsigned long transmit_timer = 0; 
+unsigned long health_transmit_timer = 0;
+
+struct P_STATE{
+    int xbee;
+    int sensor_array;
+};
+
+P_STATE power_state;
+
+LowPassFilter battery_filter;
+LowPassFilter solar_filter;
+long battery_sample = 0; 
+long solar_sample = 0;
+
+schema_6 debug_text;
+
+
 long sampleBatteryVoltage(void);
 long sampleSmoothBatteryV(int sample);
 
@@ -17,3 +83,21 @@ void enterSleep(void);
 void configurePins(void);
 
 void transmitPacketHello(void);
+void sampleANDtransmit(void);
+void configurePins(void);
+void transmitPacketHello(void);
+long sampleBatteryVoltage(void);
+double sampleBatteryVoltageRaw(void);
+
+void pstate_system(int state);
+void pstate_xbee(int state);
+void pstate_sensor_array(int state);
+void sync_pstate(void);
+
+void sendDebugPacket(char *dtext);
+void transmitDebug(void);
+
+void watch_serial(void);
+void run_command(char command);
+void barebones_routine(void);
+#endif

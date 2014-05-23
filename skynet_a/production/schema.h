@@ -12,6 +12,10 @@
  *          
  *
  ****************************************************/
+#ifndef SCHEMA_H
+#define SCHEMA_H
+
+#include <stdint.h>
 typedef struct {
 
     uint16_t schema;
@@ -97,3 +101,4 @@ typedef struct {
 } schema_6;
 
 typedef schema_6 schema_debug;
+#endif

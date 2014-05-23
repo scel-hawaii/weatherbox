@@ -1,29 +1,36 @@
-
+#include "PacketHEALTH.h"
 
 void getPacketHealth(void)
 {
+/*
     health.schema = 5;
     health.address = address;
     health.uptime_ms = millis();
     health.batt_mv = 1000*(analogRead(_PIN_BATT_V)*5/1023);
+    */
 }
 
 void transmitPacketHealth(void)
 {
+/*
     memset(rf_payload, '\0', sizeof(rf_payload));
     memcpy(rf_payload, &health, sizeof(health));
     ZBTxRequest zbtx = ZBTxRequest(addr64, rf_payload, sizeof(health));
     xbee.send(zbtx);
+    */
 }
 
 void health_data_transmit(void)
 {
+/*
     getPacketHealth();
     transmitPacketHealth();
+    */
 }
 
 void sendHealth(void)
 {
+/*
     // Set health data to transmit every 10 minutes
     // Calculation: min*(60 sec/1 min)*(1000 milli-sec/1 sec)
     long transmit_health = 600000;
@@ -52,10 +59,12 @@ void sendHealth(void)
         // Update time since last health transmission
         health_transmit_timer = millis();
     }
+    */
 }
 
 int chkHealth(void)
 {
+/*
     int apogee_voltage = 0, panel_voltage = 0;
 
     apogee_voltage = LPF_get_current_output(&solar_filter);
@@ -71,4 +80,6 @@ int chkHealth(void)
         return GOOD_SOLAR;
     else
         return POOR;
+    */
+    return 1;
 }
