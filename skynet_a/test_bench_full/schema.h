@@ -1,1 +1,0 @@
-../skynet_b03/schema.h

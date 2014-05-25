@@ -1,1 +1,0 @@
-../skynet_b03/moving_avg.ino
