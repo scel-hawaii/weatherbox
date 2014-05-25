@@ -39,7 +39,7 @@
 // TODO: This will be the primary debug mode later on, since we can program 
 // specifically using the avrisp mkii now. 
 // =============================================================================
-// #define DEBUG_SOFT
+#define DEBUG_SOFT
 
 //
 // Configure normal operation (CURRENTLY NOT TESTED)

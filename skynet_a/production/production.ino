@@ -23,12 +23,6 @@
 #define __ACTIVE 1
 #define __POWER_SAVE 0
 
-#ifdef TESTBENCH_DEBUG
-SoftwareSerial softserial(4, 5); //RX, TX
-#else
-SoftwareSerial softserial(4, 5); //RX, TX
-#endif
-
 
 /***************************************************
  *      setup()
@@ -39,14 +33,23 @@ SoftwareSerial softserial(4, 5); //RX, TX
  ***************************************************/
 void setup() {
     debug_text.schema = 6;
+    debug_init();
+
     // Set the communication speeds
+
     #ifdef TESTBENCH_DEBUG
     Serial.begin(115200);
     #else
     Serial.begin(9600);
     #endif
 
-    debug_msg("Begin Setup!");
+    delay(500);
+    debug_msg("-------------------------------------------------\n");
+    debug_msg("Smart Campus Energy Lab Apple Weatherbox Firmware\n");
+    debug_msg("-------------------------------------------------\n");
+    debug_msg("Begin Program!\n");
+    delay(500);
+
     sendDebugPacket("Begin program!");
 
     // Wait for everything to settle down
@@ -59,22 +62,19 @@ void setup() {
         battery_sample += analogRead(_PIN_BATT_V);
 	    solar_sample += analogRead(_PIN_APOGEE_V);
     }
+
     battery_sample = battery_sample / 200;
     solar_sample = solar_sample / 200;
+
     LPF_filter_init(&battery_filter, (float)battery_sample, BATT_LOWPASS_ALPHA);
     LPF_filter_init(&solar_filter, (float)solar_sample, BATT_LOWPASS_ALPHA);
-
-    debug_msg("Begin program!\n");
     
     // Initalize the Xbee depending on which mode we're set to.
     // The TESTBENCH_DEBUG mode assumes we're using software
     // serial for the xbee
-
-    softserial.begin(9600);
-
     Comm_initXbee();
 
-    
+
     // Configuration Scripts
     configurePins();
 

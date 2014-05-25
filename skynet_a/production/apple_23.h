@@ -30,8 +30,7 @@
 // 
 // #define TESTBENCH_DEBUG
 
-// This flag enables our debug messages.
-//
+// This flag enables our debug messages on the hardware line.
 // #define DEBUG
 
 // This flag enables debug messages on the softwareserial port (12, 11)(TX,RX).

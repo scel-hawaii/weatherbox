@@ -5,7 +5,13 @@
  *************************************************************/
 
 #include "Debug.h"
+SoftwareSerial softserial(4, 5); //RX, TX
 
+void debug_init(void){
+    #ifdef DEBUG_SOFT
+    softserial.begin(9600);
+    #endif
+}
 void debug_msg(char message[]){
     #ifdef DEBUG
         Serial.print(message);
