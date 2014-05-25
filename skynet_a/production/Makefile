@@ -18,4 +18,4 @@ isp-build:
 	avr-objcopy -j .text -j .data -O ihex $(FILENAME).out $(FILENAME).hex
 
 isp-reset:
-	avrdude -c avrispmkii -p $(MCU) 
+	avrdude -c avrispmkii -p $(MCU) -P usb 
