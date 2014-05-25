@@ -17,13 +17,6 @@
 #define FALSE 0
 #define TRUE 1
 
-#define __ON 1 
-#define __OFF 0
-
-#define __ACTIVE 1
-#define __POWER_SAVE 0
-
-
 /***************************************************
  *      setup()
  *
@@ -74,7 +67,6 @@ void setup() {
     // serial for the xbee
     Comm_initXbee();
 
-
     // Configuration Scripts
     configurePins();
 
@@ -85,7 +77,7 @@ void setup() {
     Packet_init(address);
 
     // turn the power on!
-    pstate_system(__ACTIVE);
+    // pstate_system(__ACTIVE);
 
     debug_msg("Wait for configuration set..\n");
     delay(500);
@@ -115,7 +107,7 @@ void loop() {
         debug_msg("Begin Loop\n");
 
         // Sean: Update current battery voltage
-	// as well as solar irradiance voltage
+	    // as well as solar irradiance voltage
         LPF_update_filter(&battery_filter, analogRead(_PIN_BATT_V));
         LPF_update_filter(&solar_filter, analogRead(_PIN_APOGEE_V));
 
@@ -149,7 +141,7 @@ void loop() {
             debug_msg("Voltage is not good!\n");
             // Shut down the power, and wait for it to be good
             // Sean: Shutting down xbee and sensors
-            pstate_system(__POWER_SAVE);
+            // pstate_system(__POWER_SAVE);
 
             // Sean: updating battery voltage
             LPF_update_filter(&battery_filter, analogRead(_PIN_BATT_V));
@@ -183,7 +175,7 @@ void loop() {
             
             // If we break out of this loop, lets re-initalize all of our systems // to make sure that we're good. 
             // Sean: re-initializing
-            pstate_system(__ACTIVE);
+            // pstate_system(__ACTIVE);
 
             // Delay 3 seconds to allow xbee to wake up. Minimum start up time
             // should be 1 second at most but 3 seconds to be safe
@@ -198,9 +190,9 @@ void loop() {
 }
 
 void watch_serial(){
-    #ifdef DEBUG_WATCH
+    #ifdef COMMAND_WATCH
     if(softserial.available()){
-        softserial.println("ENTER DEBUG MODE");
+        softserial.println("ENTER COMMAND MODE");
         while(softserial.read() != '\n');
         while(1){
             if(softserial.available()){
@@ -282,11 +274,11 @@ void barebones_routine(){
 void sampleANDtransmit(void){
     // Check which method for transmitting packet
     // use ifdef instead of switch
-#ifdef PACKET_U:
+#ifdef PACKET_U
             samplePacketUART();
             transmitPacketUART();
 #endif
-#ifdef PACKET_BINARY:
+#ifdef PACKET_BINARY
             Packet_samplePacketBinary();
             sample_counter++;
 	        // Check if desired amount of samples for transmit have been taken
@@ -341,93 +333,6 @@ void configurePins(void){
     pinMode(_PIN_SOLAR_V, INPUT);
     pinMode(_PIN_APOGEE_V, INPUT);
     pinMode(_PIN_BATT_V, INPUT);
-}
-
-/***************************************************
- *  Name:        transmitPacketHello
- *  Returns:     nothing
- *  Parameters:  None.
- *  Description: Samples and transmits an initial packet
-                    burst to help us test connectivity
- ***************************************************/
-void transmitPacketHello(void){
-    if(_CONFIG_PacketFormat == PACKET_BIN)
-    {
-        Packet_samplePacketBinary();
-        Packet_samplePacketBinary();
-        Packet_samplePacketBinary();
-        Packet_samplePacketBinary();
-        Packet_samplePacketBinary();
-        Packet_transmitPacketBinary();
-    }
-
-}
-
-/***************************************************
- *  Name:        sampleBatteryVoltage
- *  Returns:     an averaged battery voltage.
- *  Parameters:  None.
- *  Description: Samples the battery ADC voltage multiple times
-                    and averages it 
- ***************************************************/
-long sampleBatteryVoltage(void){
-    double temp;
-    for(i = 0; i < ADC_SAMPLE_NUM ; i++) {
-        temp += analogRead(_PIN_BATT_V); 
-    }
-    temp = temp/ADC_SAMPLE_NUM;
-    return ((temp*5000.0/1023));
-}
-
-/***************************************************
- *  Name:        sampleBatteryVoltageRaw
- *  Returns:     an averaged battery voltage.
- *  Parameters:  None.
- *  Description: like sampleBatteryVoltage() but returns a raw ADC 
- *                  value instead. May be useful later for saving
- *                  calculations
- ***************************************************/
-double sampleBatteryVoltageRaw(void){
-    double temp;
-    for(i = 0; i < ADC_SAMPLE_NUM ; i++) {
-        temp += analogRead(_PIN_BATT_V); 
-    }
-    temp = temp/ADC_SAMPLE_NUM;
-    return temp;
-}
-
-/********************************
- * 
- *  Power Managment Functions 
- *
- ******************************/
-void pstate_system(int state){
-    if(state == __ACTIVE){
-        pstate_xbee(__ON);
-        pstate_sensor_array(__ON);
-    }
-    else if(state == __POWER_SAVE){
-        pstate_xbee(__OFF);
-        pstate_sensor_array(__OFF);
-    }
-
-}
-// Switches the sleep states for the xbee
-void pstate_xbee(int state){
-    power_state.xbee = state; 
-    sync_pstate();
-}
-
-// Switches the power state for the sensor array using the power switch
-void pstate_sensor_array(int state){
-    power_state.sensor_array = state; 
-    sync_pstate();
-}
-
-// Sync the power states (called at the end of every pstate function)
-void sync_pstate(void){
-    digitalWrite(_PIN_XBEE_SLEEP, !power_state.xbee);
-    digitalWrite(_PIN_PSWITCH, power_state.sensor_array);
 }
 
 

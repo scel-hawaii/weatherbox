@@ -27,6 +27,7 @@
 #include "Comm.h"
 #include "PacketHEALTH.h"
 #include "PacketBINARY.h"
+#include "PowerControl.h"
 
 // Payload used for PacketUART transmission
 uint8_t payload[243];
@@ -55,13 +56,6 @@ long sample_counter = 0;
 // global timers
 unsigned long transmit_timer = 0; 
 unsigned long health_transmit_timer = 0;
-
-struct P_STATE{
-    int xbee;
-    int sensor_array;
-};
-
-P_STATE power_state;
 
 LowPassFilter battery_filter;
 LowPassFilter solar_filter;
