@@ -4,16 +4,20 @@ ARDUINO_LIBS = SCEL_MillisOverflow XBee Adafruit_MCP4725 Adafruit_INA219 Adafrui
 				DallasTemperature OneWire SHT1x Wire SoftwareSerial EEPROM
 FILENAME='production'
 MCU='atmega328p'
+MONITOR_PORT = /dev/ttyUSB2
+
+
+include Arduino.mk
 
 isp-upload:
 	ln -fs build-uno/production.hex . 
 	avrdude -c avrispmkii -p $(MCU) -P usb -U flash:w:$(FILENAME).hex
 
-include Arduino.mk
-
-
 isp-build:
 	avr-gcc -mmcu=$(MCU) $(FILENAME).c -o $(FILENAME).out
 	avr-objcopy -j .text -j .data -O ihex $(FILENAME).out $(FILENAME).hex
+
+isp-reset:
+	avrdude -c avrispmkii -p $(MCU) 
 
 
