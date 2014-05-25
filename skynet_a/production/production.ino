@@ -120,11 +120,12 @@ void loop() {
         watch_serial();
         debug_msg("Finished watching serial\n");
 
+        // If the weatherbox health is normal
         if(chkHealth() == NORMAL || chkHealth() == GOOD_SOLAR)
         {
             debug_msg("Voltage is good!\n");
 
-            // Run the barebones routine forever
+            // Run the barebones routine 
             transmit_timer = millis();
             barebones_routine();
         }
@@ -132,6 +133,7 @@ void loop() {
         // Otherwise, do this
         else{
             debug_msg("Voltage is not good!\n");
+
             // Shut down the power, and wait for it to be good
             // Sean: Shutting down xbee and sensors
             // pstate_system(__POWER_SAVE);
@@ -204,6 +206,7 @@ void watch_serial(){
     }
     #endif
 }
+
 void run_command(char command){
     switch(command){
         case 'T':
