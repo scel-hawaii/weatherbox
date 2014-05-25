@@ -45,9 +45,6 @@ void setup() {
 
     sendDebugPacket("Begin program!");
 
-    // Wait for everything to settle down
-    delay(100);
-
     // Initialize our battery sample by averaging 200 samples
     // and then sending that to our low pass filter 
     // by making that it initial sample.
@@ -98,10 +95,6 @@ void setup() {
  ***************************************************/
 void loop() {
     int batt_voltage = 0; 
-
-    // Active mode is 1
-    // Command mode is 0
-    int active_mode = 1;
 
     while(1){
         debug_msg("Begin Loop\n");
@@ -214,24 +207,23 @@ void watch_serial(){
 void run_command(char command){
     switch(command){
         case 'T':
-            Serial.println("FUN");
+            softserial.println("FUN");
             break;
         case 'B':
-            Serial.println("CMD: Transmitting binary packet");
+            softserial.println("CMD: Transmitting binary packet");
             Packet_transmitPacketBinary();
             break;
         case 'H':
-            Serial.println("CMD: Transmitting health packet");
+            softserial.println("CMD: Transmitting health packet");
             health_data_transmit();
             break;
         case 'D':
-            Serial.println("CMD: Transmitting a debug packet");
+            softserial.println("CMD: Transmitting a debug packet");
             sendDebugPacket("Here I am debugging!");
             break;
         // Get the current attached Xbee's Address and transmit it
         case 'A':
             break;
-
         default:
             break;
     }
@@ -258,36 +250,6 @@ void barebones_routine(){
     // This way, we sample exactly every second
     long wait_millis = 1000;
     while((millis() -  transmit_timer) <= wait_millis );
-}
-
-
-/***************************************************
- *  Name:        sampleANDtransmit
- *  Returns:     nothing
- *  Parameters:  None.
- *  Description: One sample and transmit function. This function
- *                  takes care of the logic behind the different modes,
- *                  and executes it when needed.
- *
- *
- ***************************************************/
-void sampleANDtransmit(void){
-    // Check which method for transmitting packet
-    // use ifdef instead of switch
-#ifdef PACKET_U
-            samplePacketUART();
-            transmitPacketUART();
-#endif
-#ifdef PACKET_BINARY
-            Packet_samplePacketBinary();
-            sample_counter++;
-	        // Check if desired amount of samples for transmit have been taken
-            if(sample_counter == _CONFIG_TransmitPeriod) {
-                Packet_transmitPacketBinary(); 
-                Packet_init(address);
-                sample_counter = 0;  // Clear the sample counter
-            }
-#endif
 }
 
 
@@ -335,17 +297,3 @@ void configurePins(void){
     pinMode(_PIN_BATT_V, INPUT);
 }
 
-
-void sendDebugPacket(char *dtext){
-    debug_text.schema = 6;
-    strcpy(debug_text.text, dtext);
-    transmitDebug();
-}
-
-void transmitDebug(void) {
-    debug_text.schema = 6;
-    memset(rf_payload, '\0', sizeof(rf_payload));
-    memcpy(rf_payload, &debug_text, sizeof(debug_text));
-    ZBTxRequest zbtx = ZBTxRequest(addr64, rf_payload, sizeof(debug_text));
-    xbee.send(zbtx);
-}

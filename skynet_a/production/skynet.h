@@ -45,8 +45,6 @@ String s;
 // length of payload (used in PacketUART) 
 int len;
 
-// payload used for PacketBINARY transmission
-uint8_t rf_payload[243];
 
 schema_health health;
 
@@ -62,9 +60,6 @@ LowPassFilter solar_filter;
 long battery_sample = 0; 
 long solar_sample = 0;
 
-schema_6 debug_text;
-
-
 long sampleBatteryVoltage(void);
 long sampleSmoothBatteryV(int sample);
 
@@ -76,14 +71,6 @@ void configurePins(void);
 void transmitPacketHello(void);
 void sampleANDtransmit(void);
 void configurePins(void);
-void transmitPacketHello(void);
-long sampleBatteryVoltage(void);
-double sampleBatteryVoltageRaw(void);
-
-void pstate_system(int state);
-void pstate_xbee(int state);
-void pstate_sensor_array(int state);
-void sync_pstate(void);
 
 void sendDebugPacket(char *dtext);
 void transmitDebug(void);

@@ -13,6 +13,9 @@
 
 #define APPLE_VERSION 23
 
+// Enable command mode
+#define COMMAND_WATCH
+
 
 // =========================================
 // 
