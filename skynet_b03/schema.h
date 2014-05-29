@@ -71,7 +71,7 @@ typedef struct {
 
     uint16_t schema;
     uint16_t address;		    // Address of Arduino	
-    uint8_t overflow_num;       // Number of times millis overflowed (happens ~every 49 days)
+    uint8_t overflow_num;   // Number of times millis overflowed (happens ~every 49 days)
     uint32_t uptime_ms;		    // Time since start of program
     uint8_t n;			        // number of data points in packet 0..30
     uint16_t batt_mv[6];	    // Battery Voltage (in milli volts)
@@ -85,6 +85,7 @@ typedef struct {
 typedef struct {
     uint16_t schema;
     uint16_t address;
+    uint8_t overflow_num;   // Number of times millis overflowed (happens ~every 49 days)
     uint32_t uptime_ms;
     uint16_t batt_mv;
 } schema_5;
