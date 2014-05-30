@@ -18,7 +18,6 @@ void clear_packet(void)
 {
     packet.schema = 3;
     packet.address = address;
-    packet.overflow_num = 0;
     packet.uptime_ms = 0;
     packet.n = 0;
     packet.bmp085_press_pa = 0;

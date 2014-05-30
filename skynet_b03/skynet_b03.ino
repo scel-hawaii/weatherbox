@@ -177,6 +177,7 @@ void setup() {
 
     // Initialize the packet!
     clear_packet();
+    packet.overflow_num = 0;
 
     // turn the power on!
     pstate_system(__ACTIVE);
