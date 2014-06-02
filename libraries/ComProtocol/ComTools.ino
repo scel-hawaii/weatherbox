@@ -1,3 +1,16 @@
+/*****************************************************************
+
+  Function name:        initExpPk
+
+  DESCRIPTION:          This function initializes all the values
+                        of the expected packet struct.
+
+  Parameters:           val - a struct holding the expected packet's
+                        attributes.
+
+  Return values:        none
+
+****************************************************************/
 void initExpPk(expPk* val)
 {
  val->header = 0;
@@ -5,7 +18,21 @@ void initExpPk(expPk* val)
  val->totalPk = 0;
 }
 
+/*****************************************************************
 
+  Function name:        storeData
+
+  DESCRIPTION:          This function is a placeholder.
+  
+                        Later, this function should be used to
+                        store data at the appropriate location.
+
+  Parameters:           data - a pointer to the recieved packet
+                        length - the length of the packet
+
+  Return values:        none
+
+****************************************************************/
 void storeData(uint8_t *data, uint8_t length)
 {  
   for (int i = 3; i < length; i++)
@@ -14,7 +41,19 @@ void storeData(uint8_t *data, uint8_t length)
   }
 }
 
+/*****************************************************************
 
+  Function name:        requestPacket
+
+  DESCRIPTION:          This function will request a packet with a
+                        given header and packet number.
+
+  Parameters:           val - a struct holding the expected packet's
+                        attributes.
+
+  Return values:        none
+
+****************************************************************/
 void requestPacket(expPk val)
 {
   uint8_t payload[3];
@@ -25,7 +64,26 @@ void requestPacket(expPk val)
   xbee.send(zbTx);
 }
 
+/*****************************************************************
 
+  Function name:        handleXBeeRx
+
+  DESCRIPTION:          This function verifies that the received
+                        packet was the expected packet.  If it is,
+                        it calls the appropriate function to extract
+                        data and then increments the expected packet
+                        counter.  Then, a request for the next
+                        expected packet is made.
+                        
+                        Once the final packet is reached, values
+                        are reinitialized and the appropriate action
+                        relating to the packet header will be executed.
+
+  Parameters:           none
+
+  Return values:        none
+
+****************************************************************/
 void handleXBeeRx()
 { 
   //fill in values
