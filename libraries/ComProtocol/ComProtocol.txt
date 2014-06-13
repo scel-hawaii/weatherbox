@@ -1,0 +1,30 @@
+Header Packet							
+Byte #	Value	Description					
+1	0x45	Command Indicator					
+2	0x00	First packet of ?? Packets.					
+3	0x00						
+4	0x??	Bytes 4-5 hold the total amount of packets to be send.					
+5	0x??						
+
+
+
+Command Packet							
+Byte #	Value	Description					
+1	0x45	Command Indicator					
+2	0x??	Packet number. Max 65536 packages, first byte is most significant and second byte is least significant. Packet # = 255*(Byte 3)+(Byte 4)					
+3	0x??						
+4	0x??	Payload byte #1					
+5	0x??	Payload byte #2					
+6	0x??	Payload byte #3					
+…	0x??	…					
+k	0x??	Payload byte # (k-5)					
+
+
+
+
+
+Request Packet							
+Byte #	Value	Description					
+1	0x45	Command Indicator					
+2	0x??	Request packet number					
+3	0x??						
