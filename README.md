@@ -41,3 +41,5 @@ library contents to your own arduino library folder, or just make repository you
 sketchbook folder. I'd recommend the fromer. If you're on linux, symlinking all of the folders
 in the weatherbox/libraries directory should work. 
 
+
+[ ![Codeship Status for scel-hawaii/weatherbox](https://www.codeship.io/projects/7840d120-1507-0132-2dc0-5a84d96a431c/status)](https://www.codeship.io/projects/33585)
